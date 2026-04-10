@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buffet Nitro - Gestión de Almuerzos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .active-tab { border-bottom: 4px solid #ffffff; font-weight: bold; }
+        .card:hover { transform: translateY(-2px); transition: 0.2s; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen font-sans text-slate-800">
+
+    <nav class="bg-indigo-700 text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center">
+            <h1 class="text-xl font-black tracking-tighter">BUFFET NITRO 🚀</h1>
+            <div class="flex space-x-2 md:space-x-4 text-sm">
+                <button onclick="showSection('votar')" class="nav-link px-2 py-1" id="tab-votar">VOTACIÓN</button>
+                <button onclick="showSection('resultado')" class="nav-link px-2 py-1" id="tab-resultado">RESULTADO</button>
+                <button onclick="showSection('proponer')" class="nav-link px-2 py-1" id="tab-proponer">PROPONER</button>
+                <button onclick="checkAdmin()" class="nav-link px-2 py-1" id="tab-admin">ADMIN</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto p-4 md:p-8">
+        
+        <section id="votar" class="section-content">
+            <header class="mb-8">
+                <h2 class="text-3xl font-bold">Arma tu Menú</h2>
+                <p class="text-slate-500">Selecciona una opción por categoría para mañana.</p>
+            </header>
+            <form id="voteForm" class="space-y-6">
+                <div id="categoriasContainer" class="grid gap-6 md:grid-cols-2">
+                    <div class="animate-pulse bg-white p-6 rounded-xl shadow-sm h-32"></div>
+                </div>
+                <div class="pt-6">
+                    <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-4 rounded-xl shadow-indigo-200 shadow-lg hover:bg-indigo-700 transition">
+                        ENVIAR MIS VOTOS
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <section id="resultado" class="section-content hidden">
+            <h2 class="text-2xl font-bold mb-6">Popularidad Histórica</h2>
+            <div class="bg-white p-6 rounded-2xl shadow-sm mb-8">
+                <canvas id="statsChart" width="400" height="200"></canvas>
+            </div>
+            <div id="topPlatos" class="grid gap-4">
+                </div>
+        </section>
+
+        <section id="proponer" class="section-content hidden">
+            <h2 class="text-2xl font-bold mb-4">Proponer Nuevo Plato</h2>
+            <p class="mb-6 text-slate-500 text-sm">Recuerda: Solo 1 propuesta por categoría a la semana.</p>
+            <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
+                <div class="space-y-4">
+                    <input type="text" id="prop-usuario" placeholder="Tu Nombre o ID" class="w-full p-3 border rounded-lg">
+                    <select id="prop-cat" class="w-full p-3 border rounded-lg"></select>
+                    <input type="text" id="prop-nombre" placeholder="Nombre del Plato (Ej: Lomo Saltado)" class="w-full p-3 border rounded-lg">
+                    <button onclick="enviarPropuesta()" class="w-full bg-emerald-500 text-white font-bold py-3 rounded-lg hover:bg-emerald-600 transition">
+                        SUBIR PROPUESTA
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section id="admin" class="section-content hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold">Panel de Administración</h2>
+                <button onclick="abrirModalAgregar()" class="bg-indigo-100 text-indigo-700 px-4 py-2 rounded-lg font-bold">+ Agregar</button>
+            </div>
+            <div class="overflow-x-auto bg-white rounded-xl shadow-sm border">
+                <table class="w-full text-left">
+                    <thead class="bg-slate-50 border-b">
+                        <tr>
+                            <th class="p-4 text-xs font-bold uppercase text-slate-400">Categoría</th>
+                            <th class="p-4 text-xs font-bold uppercase text-slate-400">Plato</th>
+                            <th class="p-4 text-xs font-bold uppercase text-slate-400">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminTableBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // --- CONFIGURACIÓN PRONTIS ---
+        const API_URL = "https://script.google.com/macros/s/AKfycbwSqAqiBpNfjuEhJj2_qbhanJEar9Huk48tKQaI8l8jgOoqmMtDlkZ3UoLeDfAJbjg/exec"; // REEMPLAZA ESTO
+        let globalOptions = {};
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchMenu();
+            showSection('votar');
+        });
+
+        async function fetchMenu() {
+            try {
+                const res = await fetch(API_URL + "?action=get_opciones");
+                const json = await res.json();
+                if(json.success) {
+                    globalOptions = json.data;
+                    renderVotacion();
+                    renderPropOptions();
+                }
+            } catch (e) { alert("Error conectando con la base de datos."); }
+        }
+
+        function renderVotacion() {
+            const container = document.getElementById('categoriasContainer');
+            container.innerHTML = '';
+            for (const cat in globalOptions) {
+                const div = document.createElement('div');
+                div.className = "bg-white p-6 rounded-2xl shadow-sm border border-slate-100 card";
+                div.innerHTML = `
+                    <h3 class="font-bold text-indigo-600 mb-4 uppercase tracking-widest text-xs">${cat}</h3>
+                    <select name="${cat}" class="w-full p-3 bg-slate-50 border-none rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none" required>
+                        <option value="">Selecciona...</option>
+                        ${globalOptions[cat].map(o => `<option value="${o}">${o}</option>`).join('')}
+                    </select>
+                `;
+                container.appendChild(div);
+            }
+        }
+
+        async function registrarVoto(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const selecciones = Object.fromEntries(formData);
+            
+            // Loader
+            const btn = e.target.querySelector('button');
+            btn.innerText = "PROCESANDO...";
+            btn.disabled = true;
+
+            const res = await fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'votar', selecciones })
+            });
+            const result = await res.json();
+            if(result.success) {
+                alert("¡Voto registrado! Que disfrutes tu almuerzo.");
+                e.target.reset();
+            }
+            btn.innerText = "ENVIAR MIS VOTOS";
+            btn.disabled = false;
+        }
+        document.getElementById('voteForm').onsubmit = registrarVoto;
+
+        // Histórico con Chart.js
+        async function loadStats() {
+            const res = await fetch(API_URL + "?action=get_stats");
+            const json = await res.json();
+            const ctx = document.getElementById('statsChart').getContext('2d');
+            
+            const labels = Object.keys(json.stats);
+            const values = Object.values(json.stats);
+
+            if(window.myChart) window.myChart.destroy();
+            window.myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: [{
+                        label: 'Votos Totales',
+                        data: values,
+                        backgroundColor: '#6366f1'
+                    }]
+                },
+                options: { indexAxis: 'y', responsive: true }
+            });
+        }
+
+        // --- UTILIDADES DE NAVEGACIÓN ---
+        function showSection(id) {
+            document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active-tab'));
+            document.getElementById('tab-' + id).classList.add('active-tab');
+            if(id === 'resultado') loadStats();
+            if(id === 'admin') renderAdminTable();
+        }
+
+        function checkAdmin() {
+            // Un password simple para evitar que todos entren al CRUD
+            const pass = prompt("Clave de Administrador:");
+            if(pass === "1234") showSection('admin'); 
+            else alert("Acceso denegado");
+        }
+
+        // Lógica CRUD simplificada
+        async function renderAdminTable() {
+            const tbody = document.getElementById('adminTableBody');
+            tbody.innerHTML = '';
+            for (const cat in globalOptions) {
+                globalOptions[cat].forEach(plato => {
+                    const tr = document.createElement('tr');
+                    tr.className = "border-b hover:bg-slate-50";
+                    tr.innerHTML = `
+                        <td class="p-4 text-sm font-medium">${cat}</td>
+                        <td class="p-4 text-sm">${plato}</td>
+                        <td class="p-4">
+                            <button onclick="eliminarPlato('${cat}', '${plato}')" class="text-red-500 hover:underline text-xs">Eliminar</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+        }
+
+        async function eliminarPlato(cat, nombre) {
+            if(!confirm(`¿Eliminar ${nombre}?`)) return;
+            await fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'crud_admin', subAction: 'eliminar', categoria: cat, nombre })
+            });
+            fetchMenu().then(renderAdminTable);
+        }
+
+        function renderPropOptions() {
+            const sel = document.getElementById('prop-cat');
+            sel.innerHTML = Object.keys(globalOptions).map(c => `<option value="${c}">${c}</option>`).join('');
+        }
+
+        async function enviarPropuesta() {
+            const usuario = document.getElementById('prop-usuario').value;
+            const categoria = document.getElementById('prop-cat').value;
+            const nombre = document.getElementById('prop-nombre').value;
+            if(!usuario || !nombre) return alert("Completa todos los campos");
+
+            const res = await fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'proponer', usuario, categoria, nombre })
+            });
+            const json = await res.json();
+            alert(json.message);
+        }
+    </script>
+</body>
+</html>
