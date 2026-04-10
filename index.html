@@ -3,244 +3,205 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buffet Nitro - Gestión de Almuerzos</title>
+    <title>Buffet Nitro - Sistema de Gestión</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         .active-tab { border-bottom: 4px solid #ffffff; font-weight: bold; }
-        .card:hover { transform: translateY(-2px); transition: 0.2s; }
+        .hidden { display: none; }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen font-sans text-slate-800">
+<body class="bg-slate-100 min-h-screen font-sans">
 
-    <nav class="bg-indigo-700 text-white shadow-lg sticky top-0 z-50">
-        <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center">
-            <h1 class="text-xl font-black tracking-tighter">BUFFET NITRO 🚀</h1>
-            <div class="flex space-x-2 md:space-x-4 text-sm">
-                <button onclick="showSection('votar')" class="nav-link px-2 py-1" id="tab-votar">VOTACIÓN</button>
-                <button onclick="showSection('resultado')" class="nav-link px-2 py-1" id="tab-resultado">RESULTADO</button>
-                <button onclick="showSection('proponer')" class="nav-link px-2 py-1" id="tab-proponer">PROPONER</button>
-                <button onclick="checkAdmin()" class="nav-link px-2 py-1" id="tab-admin">ADMIN</button>
+    <div id="login-screen" class="flex items-center justify-center min-h-screen">
+        <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md">
+            <h1 class="text-3xl font-black text-center text-indigo-700 mb-6">BUFFET NITRO 🚀</h1>
+            <div class="space-y-4">
+                <input type="text" id="user-input" placeholder="Usuario" class="w-full p-4 border rounded-xl outline-none focus:ring-2 focus:ring-indigo-500">
+                <input type="password" id="pass-input" placeholder="Contraseña" class="w-full p-4 border rounded-xl outline-none focus:ring-2 focus:ring-indigo-500">
+                <button onclick="handleLogin()" class="w-full bg-indigo-600 text-white font-bold py-4 rounded-xl hover:bg-indigo-700 transition">INGRESAR</button>
             </div>
         </div>
-    </nav>
+    </div>
 
-    <main class="max-w-4xl mx-auto p-4 md:p-8">
-        
-        <section id="votar" class="section-content">
-            <header class="mb-8">
-                <h2 class="text-3xl font-bold">Arma tu Menú</h2>
-                <p class="text-slate-500">Selecciona una opción por categoría para mañana.</p>
-            </header>
-            <form id="voteForm" class="space-y-6">
-                <div id="categoriasContainer" class="grid gap-6 md:grid-cols-2">
-                    <div class="animate-pulse bg-white p-6 rounded-xl shadow-sm h-32"></div>
-                </div>
-                <div class="pt-6">
-                    <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-4 rounded-xl shadow-indigo-200 shadow-lg hover:bg-indigo-700 transition">
-                        ENVIAR MIS VOTOS
-                    </button>
-                </div>
-            </form>
-        </section>
-
-        <section id="resultado" class="section-content hidden">
-            <h2 class="text-2xl font-bold mb-6">Popularidad Histórica</h2>
-            <div class="bg-white p-6 rounded-2xl shadow-sm mb-8">
-                <canvas id="statsChart" width="400" height="200"></canvas>
-            </div>
-            <div id="topPlatos" class="grid gap-4">
-                </div>
-        </section>
-
-        <section id="proponer" class="section-content hidden">
-            <h2 class="text-2xl font-bold mb-4">Proponer Nuevo Plato</h2>
-            <p class="mb-6 text-slate-500 text-sm">Recuerda: Solo 1 propuesta por categoría a la semana.</p>
-            <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
-                <div class="space-y-4">
-                    <input type="text" id="prop-usuario" placeholder="Tu Nombre o ID" class="w-full p-3 border rounded-lg">
-                    <select id="prop-cat" class="w-full p-3 border rounded-lg"></select>
-                    <input type="text" id="prop-nombre" placeholder="Nombre del Plato (Ej: Lomo Saltado)" class="w-full p-3 border rounded-lg">
-                    <button onclick="enviarPropuesta()" class="w-full bg-emerald-500 text-white font-bold py-3 rounded-lg hover:bg-emerald-600 transition">
-                        SUBIR PROPUESTA
-                    </button>
+    <div id="app-container" class="hidden">
+        <nav class="bg-indigo-700 text-white shadow-lg sticky top-0 z-50">
+            <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+                <span class="font-bold text-sm" id="welcome-msg"></span>
+                <div class="flex space-x-4 text-xs font-bold uppercase">
+                    <button onclick="showSection('votar')" id="tab-votar" class="nav-link py-1">Votar</button>
+                    <button onclick="showSection('proponer')" id="tab-proponer" class="nav-link py-1">Proponer</button>
+                    <button onclick="showSection('resultado')" id="tab-resultado" class="nav-link py-1">Resultados</button>
+                    <button id="admin-nav" onclick="showSection('admin')" class="nav-link py-1 hidden">Admin</button>
+                    <button onclick="logout()" class="text-indigo-200">Salir</button>
                 </div>
             </div>
-        </section>
+        </nav>
 
-        <section id="admin" class="section-content hidden">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold">Panel de Administración</h2>
-                <button onclick="abrirModalAgregar()" class="bg-indigo-100 text-indigo-700 px-4 py-2 rounded-lg font-bold">+ Agregar</button>
-            </div>
-            <div class="overflow-x-auto bg-white rounded-xl shadow-sm border">
-                <table class="w-full text-left">
-                    <thead class="bg-slate-50 border-b">
-                        <tr>
-                            <th class="p-4 text-xs font-bold uppercase text-slate-400">Categoría</th>
-                            <th class="p-4 text-xs font-bold uppercase text-slate-400">Plato</th>
-                            <th class="p-4 text-xs font-bold uppercase text-slate-400">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="adminTableBody"></tbody>
-                </table>
-            </div>
-        </section>
+        <main class="max-w-4xl mx-auto p-6">
+            <section id="votar" class="section-content">
+                <h2 class="text-2xl font-bold mb-4">Menú de Mañana</h2>
+                <form id="voteForm" class="grid gap-4 md:grid-cols-2"></form>
+                <button onclick="enviarVotos()" class="mt-8 w-full bg-indigo-600 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-indigo-700 transition">ENVIAR VOTOS</button>
+            </section>
 
-    </main>
+            <section id="resultado" class="section-content hidden">
+                <h2 class="text-2xl font-bold mb-6">Popularidad Histórica</h2>
+                <div class="bg-white p-6 rounded-2xl shadow-sm mb-8">
+                    <canvas id="statsChart"></canvas>
+                </div>
+            </section>
+
+            <section id="proponer" class="section-content hidden">
+                <h2 class="text-2xl font-bold mb-4">Proponer Plato</h2>
+                <div class="bg-white p-6 rounded-2xl shadow-sm space-y-4">
+                    <select id="prop-cat" class="w-full p-3 border rounded-xl"></select>
+                    <input type="text" id="prop-nombre" placeholder="Nombre del plato" class="w-full p-3 border rounded-xl">
+                    <button onclick="subirPropuesta()" class="w-full bg-emerald-500 text-white font-bold py-3 rounded-xl">ENVIAR PROPUESTA</button>
+                </div>
+            </section>
+
+            <section id="admin" class="section-content hidden">
+                <h2 class="text-2xl font-bold mb-6">Panel de Control</h2>
+                <div class="mb-8">
+                    <h3 class="font-bold text-indigo-600 mb-2">Gestión de Personal</h3>
+                    <div class="bg-white rounded-xl shadow overflow-hidden">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-slate-50"><tr><th class="p-3">Usuario</th><th class="p-3">Nombre</th><th class="p-3">Rol</th><th class="p-3">Acción</th></tr></thead>
+                            <tbody id="userTableBody"></tbody>
+                        </table>
+                        <div class="p-4 bg-slate-50 border-t flex gap-2">
+                            <input type="text" id="nu" placeholder="Usuario" class="p-2 border rounded w-1/4">
+                            <input type="text" id="nc" placeholder="Clave" class="p-2 border rounded w-1/4">
+                            <input type="text" id="nn" placeholder="Nombre" class="p-2 border rounded w-1/4">
+                            <select id="nr" class="p-2 border rounded w-1/4"><option value="USER">USER</option><option value="ADMIN">ADMIN</option></select>
+                            <button onclick="addUser()" class="bg-indigo-600 text-white px-4 rounded">Agregar</button>
+                        </div>
+                    </div>
+                </div>
+                </section>
+        </main>
+    </div>
 
     <script>
-        // --- CONFIGURACIÓN PRONTIS ---
-        const API_URL = "https://script.google.com/macros/s/AKfycbwSqAqiBpNfjuEhJj2_qbhanJEar9Huk48tKQaI8l8jgOoqmMtDlkZ3UoLeDfAJbjg/exec"; // REEMPLAZA ESTO
-        let globalOptions = {};
+        const API_URL = "TU_URL_DE_APPS_SCRIPT_AQUÍ"; // REEMPLAZA ESTO
+        let currentUser = JSON.parse(localStorage.getItem('buffet_session'));
 
-        // Inicialización
         document.addEventListener('DOMContentLoaded', () => {
-            fetchMenu();
-            showSection('votar');
+            if (currentUser) loginSuccess(currentUser);
         });
 
-        async function fetchMenu() {
-            try {
-                const res = await fetch(API_URL + "?action=get_opciones");
-                const json = await res.json();
-                if(json.success) {
-                    globalOptions = json.data;
-                    renderVotacion();
-                    renderPropOptions();
-                }
-            } catch (e) { alert("Error conectando con la base de datos."); }
-        }
-
-        function renderVotacion() {
-            const container = document.getElementById('categoriasContainer');
-            container.innerHTML = '';
-            for (const cat in globalOptions) {
-                const div = document.createElement('div');
-                div.className = "bg-white p-6 rounded-2xl shadow-sm border border-slate-100 card";
-                div.innerHTML = `
-                    <h3 class="font-bold text-indigo-600 mb-4 uppercase tracking-widest text-xs">${cat}</h3>
-                    <select name="${cat}" class="w-full p-3 bg-slate-50 border-none rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none" required>
-                        <option value="">Selecciona...</option>
-                        ${globalOptions[cat].map(o => `<option value="${o}">${o}</option>`).join('')}
-                    </select>
-                `;
-                container.appendChild(div);
+        async function handleLogin() {
+            const usuario = document.getElementById('user-input').value;
+            const clave = document.getElementById('pass-input').value;
+            const res = await fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'login', usuario, clave })
+            });
+            const data = await res.json();
+            if (data.success) {
+                const session = { usuario, nombre: data.nombre, rol: data.rol };
+                localStorage.setItem('buffet_session', JSON.stringify(session));
+                loginSuccess(session);
+            } else {
+                alert(data.message);
             }
         }
 
-        async function registrarVoto(e) {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            const selecciones = Object.fromEntries(formData);
+        function loginSuccess(session) {
+            currentUser = session;
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('app-container').classList.remove('hidden');
+            document.getElementById('welcome-msg').innerText = `Hola, ${session.nombre}`;
+            if (session.rol === 'ADMIN') document.getElementById('admin-nav').classList.remove('hidden');
+            fetchData();
+        }
+
+        async function fetchData() {
+            const res = await fetch(API_URL + "?action=get_opciones");
+            const json = await res.json();
+            renderMenu(json.data);
+            const userRes = await fetch(API_URL + "?action=get_usuarios");
+            const userData = await userRes.json();
+            renderUsers(userData.users);
+        }
+
+        function renderMenu(menu) {
+            const form = document.getElementById('voteForm');
+            form.innerHTML = '';
+            const propCat = document.getElementById('prop-cat');
+            propCat.innerHTML = '';
             
-            // Loader
-            const btn = e.target.querySelector('button');
-            btn.innerText = "PROCESANDO...";
-            btn.disabled = true;
+            for (const cat in menu) {
+                const div = document.createElement('div');
+                div.className = "bg-white p-4 rounded-xl shadow-sm";
+                div.innerHTML = `<label class="block font-bold mb-2 text-indigo-600 text-xs uppercase">${cat}</label>
+                    <select name="${cat}" class="w-full p-2 border rounded-lg" required>
+                    <option value="">Seleccionar...</option>
+                    ${menu[cat].map(o => `<option value="${o}">${o}</option>`).join('')}</select>`;
+                form.appendChild(div);
+                propCat.innerHTML += `<option value="${cat}">${cat}</option>`;
+            }
+        }
+
+        async function enviarVotos() {
+            const formData = new FormData(document.getElementById('voteForm'));
+            const selecciones = Object.fromEntries(formData);
+            if (Object.values(selecciones).some(v => v === "")) return alert("Selecciona una opción por categoría.");
 
             const res = await fetch(API_URL, {
                 method: 'POST',
-                body: JSON.stringify({ action: 'votar', selecciones })
+                body: JSON.stringify({ action: 'votar', usuario: currentUser.usuario, selecciones })
             });
-            const result = await res.json();
-            if(result.success) {
-                alert("¡Voto registrado! Que disfrutes tu almuerzo.");
-                e.target.reset();
-            }
-            btn.innerText = "ENVIAR MIS VOTOS";
-            btn.disabled = false;
-        }
-        document.getElementById('voteForm').onsubmit = registrarVoto;
-
-        // Histórico con Chart.js
-        async function loadStats() {
-            const res = await fetch(API_URL + "?action=get_stats");
-            const json = await res.json();
-            const ctx = document.getElementById('statsChart').getContext('2d');
-            
-            const labels = Object.keys(json.stats);
-            const values = Object.values(json.stats);
-
-            if(window.myChart) window.myChart.destroy();
-            window.myChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels,
-                    datasets: [{
-                        label: 'Votos Totales',
-                        data: values,
-                        backgroundColor: '#6366f1'
-                    }]
-                },
-                options: { indexAxis: 'y', responsive: true }
-            });
+            const data = await res.json();
+            alert(data.message);
         }
 
-        // --- UTILIDADES DE NAVEGACIÓN ---
+        function renderUsers(users) {
+            const tbody = document.getElementById('userTableBody');
+            tbody.innerHTML = users.map(u => `
+                <tr class="border-b">
+                    <td class="p-3">${u[0]}</td><td class="p-3">${u[2]}</td><td class="p-3">${u[3]}</td>
+                    <td class="p-3"><button onclick="deleteUser('${u[0]}')" class="text-red-500 text-xs">Eliminar</button></td>
+                </tr>`).join('');
+        }
+
+        async function addUser() {
+            const u = document.getElementById('nu').value;
+            const c = document.getElementById('nc').value;
+            const n = document.getElementById('nn').value;
+            const r = document.getElementById('nr').value;
+            await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'crud_usuarios', subAction: 'agregar', u, c, n, r }) });
+            fetchData();
+        }
+
+        async function deleteUser(u) {
+            if (!confirm("¿Eliminar usuario?")) return;
+            await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'crud_usuarios', subAction: 'eliminar', u }) });
+            fetchData();
+        }
+
         function showSection(id) {
             document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden'));
             document.getElementById(id).classList.remove('hidden');
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active-tab'));
             document.getElementById('tab-' + id).classList.add('active-tab');
-            if(id === 'resultado') loadStats();
-            if(id === 'admin') renderAdminTable();
+            if(id === 'resultado') renderStats();
         }
 
-        function checkAdmin() {
-            // Un password simple para evitar que todos entren al CRUD
-            const pass = prompt("Clave de Administrador:");
-            if(pass === "1234") showSection('admin'); 
-            else alert("Acceso denegado");
-        }
-
-        // Lógica CRUD simplificada
-        async function renderAdminTable() {
-            const tbody = document.getElementById('adminTableBody');
-            tbody.innerHTML = '';
-            for (const cat in globalOptions) {
-                globalOptions[cat].forEach(plato => {
-                    const tr = document.createElement('tr');
-                    tr.className = "border-b hover:bg-slate-50";
-                    tr.innerHTML = `
-                        <td class="p-4 text-sm font-medium">${cat}</td>
-                        <td class="p-4 text-sm">${plato}</td>
-                        <td class="p-4">
-                            <button onclick="eliminarPlato('${cat}', '${plato}')" class="text-red-500 hover:underline text-xs">Eliminar</button>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-            }
-        }
-
-        async function eliminarPlato(cat, nombre) {
-            if(!confirm(`¿Eliminar ${nombre}?`)) return;
-            await fetch(API_URL, {
-                method: 'POST',
-                body: JSON.stringify({ action: 'crud_admin', subAction: 'eliminar', categoria: cat, nombre })
+        async function renderStats() {
+            const res = await fetch(API_URL + "?action=get_stats");
+            const data = await res.json();
+            const ctx = document.getElementById('statsChart').getContext('2d');
+            if (window.chartObj) window.chartObj.destroy();
+            window.chartObj = new Chart(ctx, {
+                type: 'bar',
+                data: { labels: Object.keys(data.stats), datasets: [{ label: 'Votos Históricos', data: Object.values(data.stats), backgroundColor: '#6366f1' }] },
+                options: { indexAxis: 'y' }
             });
-            fetchMenu().then(renderAdminTable);
         }
 
-        function renderPropOptions() {
-            const sel = document.getElementById('prop-cat');
-            sel.innerHTML = Object.keys(globalOptions).map(c => `<option value="${c}">${c}</option>`).join('');
-        }
-
-        async function enviarPropuesta() {
-            const usuario = document.getElementById('prop-usuario').value;
-            const categoria = document.getElementById('prop-cat').value;
-            const nombre = document.getElementById('prop-nombre').value;
-            if(!usuario || !nombre) return alert("Completa todos los campos");
-
-            const res = await fetch(API_URL, {
-                method: 'POST',
-                body: JSON.stringify({ action: 'proponer', usuario, categoria, nombre })
-            });
-            const json = await res.json();
-            alert(json.message);
-        }
+        function logout() { localStorage.removeItem('buffet_session'); location.reload(); }
     </script>
 </body>
 </html>
