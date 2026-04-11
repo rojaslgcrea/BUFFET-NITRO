@@ -1,345 +1,44 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buffet Nitro - Sistema de Gestión</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        .active-tab { border-bottom: 4px solid #ffffff; font-weight: bold; }
-        .hidden { display: none; }
-        .card:hover { transform: translateY(-2px); transition: 0.2s; }
-    </style>
-</head>
-<body class="bg-slate-100 min-h-screen font-sans text-slate-800">
+function showSection(id) {
+    document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden'));
+    document.getElementById(id).classList.remove('hidden');
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active-tab'));
+    
+    const tab = document.getElementById('tab-' + id);
+    if(tab) tab.classList.add('active-tab');
 
-    <div id="login-screen" class="flex items-center justify-center min-h-screen p-4">
-        <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-slate-100">
-            <h1 class="text-3xl font-black text-center text-indigo-700 mb-6 tracking-tighter">BUFFET NITRO 🚀</h1>
-            <div class="space-y-4">
-                <input type="text" id="user-input" placeholder="Usuario" class="w-full p-4 bg-slate-50 border-none rounded-xl outline-none focus:ring-2 focus:ring-indigo-500">
-                <input type="password" id="pass-input" placeholder="Contraseña" class="w-full p-4 bg-slate-50 border-none rounded-xl outline-none focus:ring-2 focus:ring-indigo-500">
-                <button onclick="handleLogin()" class="w-full bg-indigo-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-indigo-100 hover:bg-indigo-700 transition">INGRESAR</button>
-            </div>
-        </div>
-    </div>
+    // Lógica de Horario: 13:00 PM a 16:40 PM
+    const ahora = new Date();
+    const hora = ahora.getHours();
+    const min = ahora.getMinutes();
+    const tiempoDecimal = hora + (min / 60);
+    
+    // Rango: 13.0 <= tiempo <= 16.66
+    const estaEnHorario = (tiempoDecimal >= 13) && (tiempoDecimal <= 16.66);
 
-    <div id="app-container" class="hidden">
-        <nav class="bg-indigo-700 text-white shadow-lg sticky top-0 z-50">
-            <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
-                <span class="font-bold text-xs md:text-sm italic" id="welcome-msg"></span>
-                <div class="flex space-x-2 md:space-x-4 text-[10px] md:text-xs font-bold uppercase">
-                    <button onclick="showSection('votar')" id="tab-votar" class="nav-link py-1">Votar</button>
-                    <button onclick="showSection('proponer')" id="tab-proponer" class="nav-link py-1">Propuestas</button>
-                    <button onclick="showSection('resultado')" id="tab-resultado" class="nav-link py-1">Resultados</button>
-                    <button id="admin-nav" onclick="showSection('admin')" class="nav-link py-1 hidden">Admin</button>
-                    <button onclick="logout()" class="text-indigo-200 border-l border-indigo-500 pl-2">Salir</button>
-                </div>
-            </div>
-        </nav>
-
-        <main class="max-w-5xl mx-auto p-4 md:p-8">
-            
-            <section id="votar" class="section-content">
-                <header class="mb-6">
-                    <h2 class="text-3xl font-black text-slate-800">Menú de Mañana</h2>
-                </header>
-                <div id="voto-dinamico-container">
-                    <form id="voteForm" class="grid gap-4 md:grid-cols-2"></form>
-                    <button id="btn-votar" onclick="enviarVotos()" class="mt-8 w-full bg-indigo-600 text-white font-bold py-5 rounded-2xl shadow-xl shadow-indigo-100 hover:bg-indigo-700 transition">
-                        ENVIAR MI ELECCIÓN
-                    </button>
-                </div>
-            </section>
-
-            <section id="proponer" class="section-content hidden">
-                <div class="grid gap-8 md:grid-cols-2">
-                    <div>
-                        <h2 class="text-2xl font-bold mb-4">Nueva Propuesta</h2>
-                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 space-y-4">
-                            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Categoría</label>
-                            <select id="prop-cat" class="w-full p-3 bg-slate-50 border-none rounded-xl focus:ring-2 focus:ring-indigo-500"></select>
-                            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Nombre del Plato</label>
-                            <input type="text" id="prop-nombre" placeholder="¿Qué plato sugieres?" class="w-full p-3 bg-slate-50 border-none rounded-xl focus:ring-2 focus:ring-indigo-500">
-                            <button onclick="subirPropuesta()" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-xl hover:bg-indigo-700 transition">POSTULAR PLATO</button>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="flex justify-between items-end mb-4">
-                            <h2 class="text-2xl font-bold">Apoyar Ideas</h2>
-                            <span class="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full font-bold uppercase tracking-tighter">2 Votos Semanales</span>
-                        </div>
-                        <div id="lista-propuestas" class="space-y-3 max-h-[500px] overflow-y-auto pr-2">
-                            <p class="text-center text-slate-400 py-10 animate-pulse">Cargando propuestas...</p>
-                        </div>
+    if ((id === 'votar' || id === 'resultado') && !estaEnHorario && currentUser.rol !== 'ADMIN') {
+        const containerId = id === 'votar' ? 'voto-dinamico-container' : 'resultados-grid';
+        const container = document.getElementById(containerId);
+        
+        if (container) {
+            container.innerHTML = `
+                <div class="col-span-full bg-amber-50 border-2 border-amber-200 p-10 rounded-3xl text-center">
+                    <p class="text-5xl mb-4">🙄</p>
+                    <h3 class="text-2xl font-black text-amber-800 mb-2">¡AH! ¿AHORA SI QUIERES VOTAR?</h3>
+                    <p class="text-amber-700 font-medium italic">Espera el horario establecido.</p>
+                    <div class="mt-6 inline-block bg-white px-4 py-2 rounded-full border border-amber-200 text-xs font-bold text-amber-600 uppercase tracking-widest">
+                        Horario: 13:00 PM - 16:40 PM
                     </div>
                 </div>
-            </section>
-
-            <section id="resultado" class="section-content hidden">
-                <header class="mb-8 flex justify-between items-end">
-                    <div>
-                        <h2 class="text-3xl font-black text-slate-800">Resultados del Día</h2>
-                        <p class="text-slate-500 text-sm italic">Opciones ganadoras para mañana (Horario restringido).</p>
-                    </div>
-                    <button onclick="renderStats()" class="bg-indigo-100 text-indigo-700 px-4 py-2 rounded-xl text-xs font-bold hover:bg-indigo-200">
-                        REFRESCAR ↻
-                    </button>
-                </header>
-                <div id="resultados-grid" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3"></div>
-                <div class="mt-12 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                    <h3 class="font-bold text-slate-400 uppercase text-[10px] mb-4 tracking-widest">Acumulado Histórico</h3>
-                    <canvas id="statsChart"></canvas>
-                </div>
-            </section>
-
-            <section id="admin" class="section-content hidden">
-                <h2 class="text-2xl font-bold mb-6 italic text-indigo-700">Panel de Control de RRHH</h2>
-                <div class="mb-8">
-                    <h3 class="font-bold text-slate-500 text-xs uppercase mb-3">Gestión de Personal</h3>
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left text-sm">
-                                <thead class="bg-slate-50 text-slate-400 font-bold uppercase text-[10px]">
-                                    <tr><th class="p-4">Usuario</th><th class="p-4">Nombre</th><th class="p-4">Rol</th><th class="p-4 text-center">Acción</th></tr>
-                                </thead>
-                                <tbody id="userTableBody"></tbody>
-                            </table>
-                        </div>
-                        <div class="p-4 bg-slate-50 border-t flex flex-wrap gap-2">
-                            <input type="text" id="nu" placeholder="Usuario" class="p-2 border rounded-lg text-sm flex-1">
-                            <input type="text" id="nc" placeholder="Clave" class="p-2 border rounded-lg text-sm flex-1">
-                            <input type="text" id="nn" placeholder="Nombre" class="p-2 border rounded-lg text-sm flex-1">
-                            <select id="nr" class="p-2 border rounded-lg text-sm w-full md:w-auto"><option value="USER">USER</option><option value="ADMIN">ADMIN</option></select>
-                            <button onclick="addUser()" class="bg-indigo-600 text-white px-6 py-2 rounded-lg font-bold text-sm w-full md:w-auto">Añadir Colaborador</button>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </main>
-    </div>
-
-    <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbwG3MZT6FjsSulWrSW0e2R8mFK6wFVlIwUphdC4T6cesCwsZLymwMqPcdTbccvszO0/exec"; 
-        let currentUser = JSON.parse(localStorage.getItem('buffet_session'));
-
-        document.addEventListener('DOMContentLoaded', () => {
-            if (currentUser) loginSuccess(currentUser);
-        });
-
-        async function handleLogin() {
-            const usuario = document.getElementById('user-input').value;
-            const clave = document.getElementById('pass-input').value;
-            const res = await fetch(API_URL, {
-                method: 'POST',
-                body: JSON.stringify({ action: 'login', usuario, clave })
-            });
-            const data = await res.json();
-            if (data.success) {
-                const session = { usuario, nombre: data.nombre, rol: data.rol };
-                localStorage.setItem('buffet_session', JSON.stringify(session));
-                loginSuccess(session);
-            } else { alert("❌ " + data.message); }
+            `;
+            if(id === 'resultado') document.querySelector('canvas').parentElement.classList.add('hidden');
         }
+        return; 
+    }
 
-        function loginSuccess(session) {
-            currentUser = session;
-            document.getElementById('login-screen').classList.add('hidden');
-            document.getElementById('app-container').classList.remove('hidden');
-            document.getElementById('welcome-msg').innerText = `👋 Hola, ${session.nombre}`;
-            if (session.rol === 'ADMIN') document.getElementById('admin-nav').classList.remove('hidden');
-            fetchData();
-            showSection('votar'); 
-        }
-
-        async function fetchData() {
-            try {
-                const res = await fetch(API_URL + "?action=get_opciones");
-                const json = await res.json();
-                renderMenu(json.data);
-                if (currentUser.rol === 'ADMIN') {
-                    const userRes = await fetch(API_URL + "?action=get_usuarios");
-                    const userData = await userRes.json();
-                    renderUsers(userData.users);
-                }
-            } catch (e) { console.error("Error al cargar datos."); }
-        }
-
-        function renderMenu(menu) {
-            const form = document.getElementById('voteForm');
-            const propCat = document.getElementById('prop-cat');
-            form.innerHTML = ''; propCat.innerHTML = '';
-            for (const cat in menu) {
-                const div = document.createElement('div');
-                div.className = "bg-white p-5 rounded-2xl shadow-sm border border-slate-100 card";
-                div.innerHTML = `<label class="block font-black mb-3 text-indigo-600 text-[10px] uppercase tracking-widest">${cat}</label>
-                    <select name="${cat}" class="w-full p-3 bg-slate-50 border-none rounded-xl outline-none focus:ring-2 focus:ring-indigo-400" required>
-                    <option value="">Seleccionar...</option>
-                    ${menu[cat].map(o => `<option value="${o}">${o}</option>`).join('')}</select>`;
-                form.appendChild(div);
-                propCat.innerHTML += `<option value="${cat}">${cat}</option>`;
-            }
-        }
-
-        async function enviarVotos() {
-            const formData = new FormData(document.getElementById('voteForm'));
-            const selecciones = Object.fromEntries(formData);
-            if (Object.values(selecciones).some(v => v === "")) return alert("⚠️ Selecciona una opción por categoría.");
-            const res = await fetch(API_URL, {
-                method: 'POST',
-                body: JSON.stringify({ action: 'votar', usuario: currentUser.usuario, selecciones })
-            });
-            const data = await res.json();
-            alert(data.message);
-        }
-
-        async function cargarPropuestasParaVotar() {
-            const container = document.getElementById('lista-propuestas');
-            container.innerHTML = '<p class="text-center text-slate-400 py-10 text-sm animate-pulse">Actualizando lista...</p>';
-            try {
-                const res = await fetch(API_URL + "?action=get_propuestas");
-                const json = await res.json();
-                if(json.success && json.propuestas.length > 0) {
-                    container.innerHTML = '';
-                    json.propuestas.forEach(p => {
-                        const div = document.createElement('div');
-                        div.className = "bg-white p-4 rounded-xl border border-slate-100 flex justify-between items-center shadow-sm card hover:border-indigo-100 transition";
-                        div.innerHTML = `
-                            <div class="flex-1">
-                                <p class="text-[9px] font-bold text-indigo-500 uppercase">${p.categoria}</p>
-                                <p class="font-bold text-slate-700 text-sm">${p.nombre}</p>
-                                <p class="text-[9px] text-slate-400 mt-1">Por: ${p.autor} | ${p.votos} Apoyos</p>
-                            </div>
-                            <button onclick="apoyarPropuesta(${p.id})" class="bg-emerald-50 text-emerald-600 px-4 py-2 rounded-lg text-[10px] font-black hover:bg-emerald-600 hover:text-white transition uppercase">Apoyar</button>`;
-                        container.appendChild(div);
-                    });
-                } else { container.innerHTML = '<p class="text-center text-slate-400 py-10 text-sm italic">Sin propuestas esta semana.</p>'; }
-            } catch (e) { container.innerHTML = '<p class="text-center text-red-400 py-10 text-xs font-bold">Error de sincronización.</p>'; }
-        }
-
-        async function apoyarPropuesta(filaId) {
-            if(!confirm("¿Deseas usar uno de tus 2 apoyos semanales?")) return;
-            const res = await fetch(API_URL, {
-                method: 'POST',
-                body: JSON.stringify({ action: 'votar_propuesta', usuario: currentUser.usuario, filaPropuesta: filaId })
-            });
-            const data = await res.json();
-            alert(data.message);
-            if(data.success) cargarPropuestasParaVotar();
-        }
-
-        async function subirPropuesta() {
-            const categoria = document.getElementById('prop-cat').value;
-            const nombre = document.getElementById('prop-nombre').value;
-            if(!nombre) return alert("Escribe el nombre del plato.");
-            const res = await fetch(API_URL, {
-                method: 'POST',
-                body: JSON.stringify({ action: 'proponer', usuario: currentUser.usuario, categoria, nombre })
-            });
-            const data = await res.json();
-            alert(data.message);
-            if(data.success) { document.getElementById('prop-nombre').value = ''; cargarPropuestasParaVotar(); }
-        }
-
-        function renderUsers(users) {
-            const tbody = document.getElementById('userTableBody');
-            tbody.innerHTML = users.map(u => `
-                <tr class="border-b hover:bg-slate-50 transition">
-                    <td class="p-4 font-bold text-slate-700">${u[0]}</td><td class="p-4">${u[2]}</td><td class="p-4"><span class="px-2 py-1 rounded text-[10px] font-bold ${u[3] === 'ADMIN' ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-100 text-slate-500'}">${u[3]}</span></td>
-                    <td class="p-4 text-center"><button onclick="deleteUser('${u[0]}')" class="text-red-400 hover:text-red-600 font-bold text-xs uppercase tracking-widest">Eliminar</button></td>
-                </tr>`).join('');
-        }
-
-        async function addUser() {
-            const u = document.getElementById('nu').value, c = document.getElementById('nc').value, n = document.getElementById('nn').value, r = document.getElementById('nr').value;
-            if(!u || !c || !n) return alert("Completa los datos del nuevo colaborador.");
-            await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'crud_usuarios', subAction: 'agregar', u, c, n, r }) });
-            fetchData();
-        }
-
-        async function deleteUser(u) {
-            if (!confirm(`¿Eliminar al colaborador ${u}?`)) return;
-            await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'crud_usuarios', subAction: 'eliminar', u }) });
-            fetchData();
-        }
-
-        function showSection(id) {
-            document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden'));
-            document.getElementById(id).classList.remove('hidden');
-            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active-tab'));
-            const tab = document.getElementById('tab-' + id);
-            if(tab) tab.classList.add('active-tab');
-
-            const ahora = new Date();
-            const hora = ahora.getHours();
-            const min = ahora.getMinutes();
-            const tiempoDecimal = hora + (min / 60);
-            
-            // LÓGICA DE HORARIO: 13:00 (13.0) a 16:40 (16.66)
-            const estaEnHorario = (tiempoDecimal >= 13) && (tiempoDecimal <= 16.66);
-
-            if ((id === 'votar' || id === 'resultado') && !estaEnHorario && currentUser.rol !== 'ADMIN') {
-                const containerId = id === 'votar' ? 'voto-dinamico-container' : 'resultados-grid';
-                const container = document.getElementById(containerId);
-                if (container) {
-                    container.innerHTML = `
-                        <div class="col-span-full bg-amber-50 border-2 border-amber-200 p-10 rounded-3xl text-center">
-                            <p class="text-5xl mb-4">🙄</p>
-                            <h3 class="text-2xl font-black text-amber-800 mb-2">¡AH! ¿AHORA SI QUIERES VOTAR?</h3>
-                            <p class="text-amber-700 font-medium italic">Espera el horario establecido.</p>
-                            <div class="mt-6 inline-block bg-white px-4 py-2 rounded-full border border-amber-200 text-xs font-bold text-amber-600 uppercase tracking-widest">
-                                Horario: 13:00 PM - 16:40 PM
-                            </div>
-                        </div>
-                    `;
-                    if(id === 'resultado') document.querySelector('canvas').parentElement.classList.add('hidden');
-                }
-                return; 
-            }
-
-            if(id === 'resultado') {
-                if(document.querySelector('canvas')) document.querySelector('canvas').parentElement.classList.remove('hidden');
-                renderStats();
-            }
-            if(id === 'proponer') cargarPropuestasParaVotar();
-        }
-
-        async function renderStats() {
-            const grid = document.getElementById('resultados-grid');
-            grid.innerHTML = '<p class="col-span-full text-center text-indigo-500 py-10 animate-bounce font-bold">Calculando podios...</p>';
-            try {
-                const res = await fetch(API_URL + "?action=get_resultados_dia");
-                const json = await res.json();
-                if (json.success && Object.keys(json.resultados).length > 0) {
-                    grid.innerHTML = '';
-                    for (const categoria in json.resultados) {
-                        const card = document.createElement('div');
-                        card.className = "bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex flex-col h-full";
-                        card.innerHTML = `
-                            <div class="mb-4"><span class="bg-indigo-50 text-indigo-700 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">${categoria}</span></div>
-                            <div class="space-y-4 flex-grow">${json.resultados[categoria].map((p, index) => `
-                                <div class="flex justify-between items-center p-2 rounded-xl ${index === 0 ? 'bg-amber-50/50' : 'bg-slate-50'}">
-                                    <div class="flex items-center gap-3"><span class="text-xl">${index === 0 ? '🥇' : '🥈'}</span><span class="text-sm font-bold text-slate-700">${p.nombre}</span></div>
-                                    <span class="text-[10px] font-black text-indigo-500 bg-white px-2 py-1 rounded-md shadow-sm">${p.votos} VOTOS</span>
-                                </div>`).join('')}</div>`;
-                        grid.appendChild(card);
-                    }
-                } else { grid.innerHTML = '<p class="col-span-full text-center text-slate-400 py-10">No hay votos registrados.</p>'; }
-            } catch (e) { grid.innerHTML = '<p class="col-span-full text-center text-red-400 py-10">Error de conexión.</p>'; }
-
-            const histRes = await fetch(API_URL + "?action=get_stats");
-            const histData = await histRes.json();
-            const ctx = document.getElementById('statsChart').getContext('2d');
-            if (window.chartObj) window.chartObj.destroy();
-            window.chartObj = new Chart(ctx, {
-                type: 'bar',
-                data: { labels: Object.keys(histData.stats), datasets: [{ label: 'Votos', data: Object.values(histData.stats), backgroundColor: '#6366f1', borderRadius: 5 }] },
-                options: { indexAxis: 'y', plugins: { legend: { display: false } } }
-            });
-        }
-
-        function logout() { localStorage.removeItem('buffet_session'); location.reload(); }
-    </script>
-</body>
-</html>
+    if(id === 'resultado') {
+        const canvasParent = document.querySelector('canvas').parentElement;
+        if(canvasParent) canvasParent.classList.remove('hidden');
+        renderStats();
+    }
+    if(id === 'proponer') cargarPropuestasParaVotar();
+}
