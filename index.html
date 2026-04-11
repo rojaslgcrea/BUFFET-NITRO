@@ -42,13 +42,17 @@
         <main class="max-w-5xl mx-auto p-4 md:p-8">
             
             <section id="votar" class="section-content">
-                <header class="mb-6">
-                    <h2 class="text-3xl font-black text-slate-800">Menú de Mañana</h2>
-                    <p class="text-slate-500 text-sm italic">Elige tus favoritos del mini-bufet.</p>
-                </header>
-                <form id="voteForm" class="grid gap-4 md:grid-cols-2"></form>
-                <button onclick="enviarVotos()" class="mt-8 w-full bg-indigo-600 text-white font-bold py-5 rounded-2xl shadow-xl shadow-indigo-100 hover:bg-indigo-700 transition">ENVIAR MI ELECCIÓN</button>
-            </section>
+    <header class="mb-6">
+        <h2 class="text-3xl font-black text-slate-800">Menú de Mañana</h2>
+    </header>
+    
+    <div id="voto-dinamico-container">
+        <form id="voteForm" class="grid gap-4 md:grid-cols-2"></form>
+        <button id="btn-votar" onclick="enviarVotos()" class="mt-8 w-full bg-indigo-600 text-white font-bold py-5 rounded-2xl shadow-xl shadow-indigo-100 hover:bg-indigo-700 transition">
+            ENVIAR MI ELECCIÓN
+        </button>
+    </div>
+</section>
 
             <section id="proponer" class="section-content hidden">
                 <div class="grid gap-8 md:grid-cols-2">
@@ -121,7 +125,7 @@
     </div>
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbwmF7Lh7R7QWqF09XiwM5QL_EWGlWWAkQ_pUknVsokgz8fXa-qw8_VV1MocdAHgHmg/exec"; 
+        const API_URL = "https://script.google.com/macros/s/AKfycbwG3MZT6FjsSulWrSW0e2R8mFK6wFVlIwUphdC4T6cesCwsZLymwMqPcdTbccvszO0/exec"; 
         let currentUser = JSON.parse(localStorage.getItem('buffet_session'));
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -145,48 +149,22 @@
 
        function loginSuccess(session) {
     currentUser = session;
-    
-    // VALIDACIÓN DE HORARIO PRONTIS
-    const ahora = new Date();
-    const hora = ahora.getHours();
-    const min = ahora.getMinutes();
-    const tiempoDecimal = hora + (min / 60);
-
-    // Ventana permitida: >= 13:00 (13.0) O < 08:30 (8.5)
-    const estaEnHorario = (tiempoDecimal >= 13) || (tiempoDecimal < 8.5);
-
-    if (!estaEnHorario && session.rol !== 'ADMIN') {
-        document.getElementById('login-screen').innerHTML = `
-            <div class="text-center p-8 bg-white rounded-2xl shadow-xl">
-                <h1 class="text-4xl mb-4">🔒</h1>
-                <h2 class="text-xl font-bold text-slate-800">Sistema Cerrado</h2>
-                <p class="text-slate-500 mt-2 text-sm">Las votaciones y resultados están disponibles de <br> 
-                   <span class="font-bold text-indigo-600 text-lg">13:00 PM a 08:30 AM</span></p>
-                <button onclick="location.reload()" class="mt-6 text-indigo-500 text-xs underline">Reintentar</button>
-            </div>
-        `;
-        return;
-    }
-
-    // Si está en horario o es ADMIN, procede normal
+    // Ya no bloqueamos aquí, permitimos el acceso total al contenedor
     document.getElementById('login-screen').classList.add('hidden');
     document.getElementById('app-container').classList.remove('hidden');
     document.getElementById('welcome-msg').innerText = `👋 Hola, ${session.nombre}`;
-    if (session.rol === 'ADMIN') document.getElementById('admin-nav').classList.remove('hidden');
+    
+    if (session.rol === 'ADMIN') {
+        document.getElementById('admin-nav').classList.remove('hidden');
+    }
+    
     fetchData();
-
-            currentUser = session;
-            document.getElementById('login-screen').classList.add('hidden');
-            document.getElementById('app-container').classList.remove('hidden');
-            document.getElementById('welcome-msg').innerText = `👋 Hola, ${session.nombre}`;
-            if (session.rol === 'ADMIN') document.getElementById('admin-nav').classList.remove('hidden');
-            fetchData();
-            showSection('votar');
-        }
+    showSection('votar'); // Intentamos mostrar votación al entrar
+}
 
         async function fetchData() {
             try {
-                const res = await fetch(API_URL + "?action=get_opciones");
+                const res = await fetch(API_URL + "?action=get_opciones");function showsectio
                 const json = await res.json();
                 renderMenu(json.data);
                 if (currentUser.rol === 'ADMIN') {
@@ -300,14 +278,51 @@
         }
 
         function showSection(id) {
-            document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden'));
-            document.getElementById(id).classList.remove('hidden');
-            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active-tab'));
-            const tab = document.getElementById('tab-' + id);
-            if(tab) tab.classList.add('active-tab');
-            if(id === 'resultado') renderStats();
-            if(id === 'proponer') cargarPropuestasParaVotar();
+    // 1. Ocultar todo y gestionar pestañas
+    document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden'));
+    document.getElementById(id).classList.remove('hidden');
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active-tab'));
+    
+    const tab = document.getElementById('tab-' + id);
+    if(tab) tab.classList.add('active-tab');
+
+    // 2. NUEVA LÓGICA DE HORARIO: 13:00 (13.0) a 16:40 (16.66)
+    const ahora = new Date();
+    const hora = ahora.getHours();
+    const min = ahora.getMinutes();
+    const tiempoDecimal = hora + (min / 60);
+    
+    // Cambiamos a && porque el rango es dentro del mismo día
+    const estaEnHorario = (tiempoDecimal >= 13) && (tiempoDecimal <= 16.66);
+
+    // 3. Bloqueo para 'votar' y 'resultado'
+    if ((id === 'votar' || id === 'resultado') && !estaEnHorario && currentUser.rol !== 'ADMIN') {
+        const containerId = id === 'votar' ? 'voto-dinamico-container' : 'resultados-grid';
+        const container = document.getElementById(containerId);
+        
+        if (container) {
+            container.innerHTML = `
+                <div class="col-span-full bg-amber-50 border-2 border-amber-200 p-10 rounded-3xl text-center">
+                    <p class="text-5xl mb-4">🙄</p>
+                    <h3 class="text-2xl font-black text-amber-800 mb-2">¡AH! ¿AHORA SI QUIERES VOTAR?</h3>
+                    <p class="text-amber-700 font-medium italic">Espera el horario establecido.</p>
+                    <div class="mt-6 inline-block bg-white px-4 py-2 rounded-full border border-amber-200 text-xs font-bold text-amber-600 uppercase tracking-widest">
+                        Horario: 13:00 PM - 16:40 PM
+                    </div>
+                </div>
+            `;
+            if(id === 'resultado') document.querySelector('canvas').parentElement.classList.add('hidden');
         }
+        return; 
+    }
+
+    // 4. Carga normal
+    if(id === 'resultado') {
+        document.querySelector('canvas').parentElement.classList.remove('hidden');
+        renderStats();
+    }
+    if(id === 'proponer') cargarPropuestasParaVotar();
+}
 
         async function renderStats() {
     const grid = document.getElementById('resultados-grid');
