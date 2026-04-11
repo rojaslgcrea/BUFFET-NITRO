@@ -42,17 +42,16 @@
         <main class="max-w-5xl mx-auto p-4 md:p-8">
             
             <section id="votar" class="section-content">
-    <header class="mb-6">
-        <h2 class="text-3xl font-black text-slate-800">Menú de Mañana</h2>
-    </header>
-    
-    <div id="voto-dinamico-container">
-        <form id="voteForm" class="grid gap-4 md:grid-cols-2"></form>
-        <button id="btn-votar" onclick="enviarVotos()" class="mt-8 w-full bg-indigo-600 text-white font-bold py-5 rounded-2xl shadow-xl shadow-indigo-100 hover:bg-indigo-700 transition">
-            ENVIAR MI ELECCIÓN
-        </button>
-    </div>
-</section>
+                <header class="mb-6">
+                    <h2 class="text-3xl font-black text-slate-800">Menú de Mañana</h2>
+                </header>
+                <div id="voto-dinamico-container">
+                    <form id="voteForm" class="grid gap-4 md:grid-cols-2"></form>
+                    <button id="btn-votar" onclick="enviarVotos()" class="mt-8 w-full bg-indigo-600 text-white font-bold py-5 rounded-2xl shadow-xl shadow-indigo-100 hover:bg-indigo-700 transition">
+                        ENVIAR MI ELECCIÓN
+                    </button>
+                </div>
+            </section>
 
             <section id="proponer" class="section-content hidden">
                 <div class="grid gap-8 md:grid-cols-2">
@@ -79,24 +78,21 @@
             </section>
 
             <section id="resultado" class="section-content hidden">
-    <header class="mb-8 flex justify-between items-end">
-        <div>
-            <h2 class="text-3xl font-black text-slate-800">Resultados del Día</h2>
-            <p class="text-slate-500 text-sm italic">Opciones ganadoras para mañana (Corte: 12:00 PM).</p>
-        </div>
-        <button onclick="renderStats()" class="bg-indigo-100 text-indigo-700 px-4 py-2 rounded-xl text-xs font-bold hover:bg-indigo-200">
-            REFRESCAR ↻
-        </button>
-    </header>
-
-    <div id="resultados-grid" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        </div>
-
-    <div class="mt-12 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-        <h3 class="font-bold text-slate-400 uppercase text-[10px] mb-4 tracking-widest">Acumulado Histórico</h3>
-        <canvas id="statsChart"></canvas>
-    </div>
-</section>
+                <header class="mb-8 flex justify-between items-end">
+                    <div>
+                        <h2 class="text-3xl font-black text-slate-800">Resultados del Día</h2>
+                        <p class="text-slate-500 text-sm italic">Opciones ganadoras para mañana (Horario restringido).</p>
+                    </div>
+                    <button onclick="renderStats()" class="bg-indigo-100 text-indigo-700 px-4 py-2 rounded-xl text-xs font-bold hover:bg-indigo-200">
+                        REFRESCAR ↻
+                    </button>
+                </header>
+                <div id="resultados-grid" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3"></div>
+                <div class="mt-12 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                    <h3 class="font-bold text-slate-400 uppercase text-[10px] mb-4 tracking-widest">Acumulado Histórico</h3>
+                    <canvas id="statsChart"></canvas>
+                </div>
+            </section>
 
             <section id="admin" class="section-content hidden">
                 <h2 class="text-2xl font-bold mb-6 italic text-indigo-700">Panel de Control de RRHH</h2>
@@ -147,24 +143,19 @@
             } else { alert("❌ " + data.message); }
         }
 
-       function loginSuccess(session) {
-    currentUser = session;
-    // Ya no bloqueamos aquí, permitimos el acceso total al contenedor
-    document.getElementById('login-screen').classList.add('hidden');
-    document.getElementById('app-container').classList.remove('hidden');
-    document.getElementById('welcome-msg').innerText = `👋 Hola, ${session.nombre}`;
-    
-    if (session.rol === 'ADMIN') {
-        document.getElementById('admin-nav').classList.remove('hidden');
-    }
-    
-    fetchData();
-    showSection('votar'); // Intentamos mostrar votación al entrar
-}
+        function loginSuccess(session) {
+            currentUser = session;
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('app-container').classList.remove('hidden');
+            document.getElementById('welcome-msg').innerText = `👋 Hola, ${session.nombre}`;
+            if (session.rol === 'ADMIN') document.getElementById('admin-nav').classList.remove('hidden');
+            fetchData();
+            showSection('votar'); 
+        }
 
         async function fetchData() {
             try {
-                const res = await fetch(API_URL + "?action=get_opciones");function showsectio
+                const res = await fetch(API_URL + "?action=get_opciones");
                 const json = await res.json();
                 renderMenu(json.data);
                 if (currentUser.rol === 'ADMIN') {
@@ -179,7 +170,6 @@
             const form = document.getElementById('voteForm');
             const propCat = document.getElementById('prop-cat');
             form.innerHTML = ''; propCat.innerHTML = '';
-            
             for (const cat in menu) {
                 const div = document.createElement('div');
                 div.className = "bg-white p-5 rounded-2xl shadow-sm border border-slate-100 card";
@@ -196,7 +186,6 @@
             const formData = new FormData(document.getElementById('voteForm'));
             const selecciones = Object.fromEntries(formData);
             if (Object.values(selecciones).some(v => v === "")) return alert("⚠️ Selecciona una opción por categoría.");
-
             const res = await fetch(API_URL, {
                 method: 'POST',
                 body: JSON.stringify({ action: 'votar', usuario: currentUser.usuario, selecciones })
@@ -205,7 +194,6 @@
             alert(data.message);
         }
 
-        // --- LÓGICA DE PROPUESTAS INTEGRADA ---
         async function cargarPropuestasParaVotar() {
             const container = document.getElementById('lista-propuestas');
             container.innerHTML = '<p class="text-center text-slate-400 py-10 text-sm animate-pulse">Actualizando lista...</p>';
@@ -254,7 +242,6 @@
             if(data.success) { document.getElementById('prop-nombre').value = ''; cargarPropuestasParaVotar(); }
         }
 
-        // --- ADMIN Y ESTADÍSTICAS ---
         function renderUsers(users) {
             const tbody = document.getElementById('userTableBody');
             tbody.innerHTML = users.map(u => `
@@ -278,118 +265,79 @@
         }
 
         function showSection(id) {
-    // 1. Ocultar todo y gestionar pestañas
-    document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden'));
-    document.getElementById(id).classList.remove('hidden');
-    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active-tab'));
-    
-    const tab = document.getElementById('tab-' + id);
-    if(tab) tab.classList.add('active-tab');
+            document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active-tab'));
+            const tab = document.getElementById('tab-' + id);
+            if(tab) tab.classList.add('active-tab');
 
-    // 2. NUEVA LÓGICA DE HORARIO: 13:00 (13.0) a 16:40 (16.66)
-    const ahora = new Date();
-    const hora = ahora.getHours();
-    const min = ahora.getMinutes();
-    const tiempoDecimal = hora + (min / 60);
-    
-    // Cambiamos a && porque el rango es dentro del mismo día
-    const estaEnHorario = (tiempoDecimal >= 13) && (tiempoDecimal <= 16.66);
+            const ahora = new Date();
+            const hora = ahora.getHours();
+            const min = ahora.getMinutes();
+            const tiempoDecimal = hora + (min / 60);
+            
+            // LÓGICA DE HORARIO: 13:00 (13.0) a 16:40 (16.66)
+            const estaEnHorario = (tiempoDecimal >= 13) && (tiempoDecimal <= 16.66);
 
-    // 3. Bloqueo para 'votar' y 'resultado'
-    if ((id === 'votar' || id === 'resultado') && !estaEnHorario && currentUser.rol !== 'ADMIN') {
-        const containerId = id === 'votar' ? 'voto-dinamico-container' : 'resultados-grid';
-        const container = document.getElementById(containerId);
-        
-        if (container) {
-            container.innerHTML = `
-                <div class="col-span-full bg-amber-50 border-2 border-amber-200 p-10 rounded-3xl text-center">
-                    <p class="text-5xl mb-4">🙄</p>
-                    <h3 class="text-2xl font-black text-amber-800 mb-2">¡AH! ¿AHORA SI QUIERES VOTAR?</h3>
-                    <p class="text-amber-700 font-medium italic">Espera el horario establecido.</p>
-                    <div class="mt-6 inline-block bg-white px-4 py-2 rounded-full border border-amber-200 text-xs font-bold text-amber-600 uppercase tracking-widest">
-                        Horario: 13:00 PM - 16:40 PM
-                    </div>
-                </div>
-            `;
-            if(id === 'resultado') document.querySelector('canvas').parentElement.classList.add('hidden');
+            if ((id === 'votar' || id === 'resultado') && !estaEnHorario && currentUser.rol !== 'ADMIN') {
+                const containerId = id === 'votar' ? 'voto-dinamico-container' : 'resultados-grid';
+                const container = document.getElementById(containerId);
+                if (container) {
+                    container.innerHTML = `
+                        <div class="col-span-full bg-amber-50 border-2 border-amber-200 p-10 rounded-3xl text-center">
+                            <p class="text-5xl mb-4">🙄</p>
+                            <h3 class="text-2xl font-black text-amber-800 mb-2">¡AH! ¿AHORA SI QUIERES VOTAR?</h3>
+                            <p class="text-amber-700 font-medium italic">Espera el horario establecido.</p>
+                            <div class="mt-6 inline-block bg-white px-4 py-2 rounded-full border border-amber-200 text-xs font-bold text-amber-600 uppercase tracking-widest">
+                                Horario: 13:00 PM - 16:40 PM
+                            </div>
+                        </div>
+                    `;
+                    if(id === 'resultado') document.querySelector('canvas').parentElement.classList.add('hidden');
+                }
+                return; 
+            }
+
+            if(id === 'resultado') {
+                if(document.querySelector('canvas')) document.querySelector('canvas').parentElement.classList.remove('hidden');
+                renderStats();
+            }
+            if(id === 'proponer') cargarPropuestasParaVotar();
         }
-        return; 
-    }
-
-    // 4. Carga normal
-    if(id === 'resultado') {
-        document.querySelector('canvas').parentElement.classList.remove('hidden');
-        renderStats();
-    }
-    if(id === 'proponer') cargarPropuestasParaVotar();
-}
 
         async function renderStats() {
-    const grid = document.getElementById('resultados-grid');
-    grid.innerHTML = '<p class="col-span-full text-center text-indigo-500 py-10 animate-bounce font-bold">Calculando podios por categoría...</p>';
+            const grid = document.getElementById('resultados-grid');
+            grid.innerHTML = '<p class="col-span-full text-center text-indigo-500 py-10 animate-bounce font-bold">Calculando podios...</p>';
+            try {
+                const res = await fetch(API_URL + "?action=get_resultados_dia");
+                const json = await res.json();
+                if (json.success && Object.keys(json.resultados).length > 0) {
+                    grid.innerHTML = '';
+                    for (const categoria in json.resultados) {
+                        const card = document.createElement('div');
+                        card.className = "bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex flex-col h-full";
+                        card.innerHTML = `
+                            <div class="mb-4"><span class="bg-indigo-50 text-indigo-700 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">${categoria}</span></div>
+                            <div class="space-y-4 flex-grow">${json.resultados[categoria].map((p, index) => `
+                                <div class="flex justify-between items-center p-2 rounded-xl ${index === 0 ? 'bg-amber-50/50' : 'bg-slate-50'}">
+                                    <div class="flex items-center gap-3"><span class="text-xl">${index === 0 ? '🥇' : '🥈'}</span><span class="text-sm font-bold text-slate-700">${p.nombre}</span></div>
+                                    <span class="text-[10px] font-black text-indigo-500 bg-white px-2 py-1 rounded-md shadow-sm">${p.votos} VOTOS</span>
+                                </div>`).join('')}</div>`;
+                        grid.appendChild(card);
+                    }
+                } else { grid.innerHTML = '<p class="col-span-full text-center text-slate-400 py-10">No hay votos registrados.</p>'; }
+            } catch (e) { grid.innerHTML = '<p class="col-span-full text-center text-red-400 py-10">Error de conexión.</p>'; }
 
-    try {
-        // Petición a la nueva acción del Backend
-        const res = await fetch(API_URL + "?action=get_resultados_dia");
-        const json = await res.json();
-        
-        if (json.success && Object.keys(json.resultados).length > 0) {
-            grid.innerHTML = ''; // Limpiamos el cargando
-            
-            // Iteramos sobre cada categoría para crear una CARD única
-            for (const categoria in json.resultados) {
-                const card = document.createElement('div');
-                card.className = "bg-white p-6 rounded-3xl shadow-sm border border-slate-200 flex flex-col h-full hover:shadow-md transition-shadow";
-                
-                // Construimos el contenido de la Card por categoría
-                card.innerHTML = `
-                    <div class="mb-4">
-                        <span class="bg-indigo-50 text-indigo-700 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">
-                            ${categoria}
-                        </span>
-                    </div>
-                    <div class="space-y-4 flex-grow">
-                        ${json.resultados[categoria].map((p, index) => `
-                            <div class="flex justify-between items-center p-2 rounded-xl ${index === 0 ? 'bg-amber-50/50' : 'bg-slate-50'}">
-                                <div class="flex items-center gap-3">
-                                    <span class="text-xl">${index === 0 ? '🥇' : '🥈'}</span>
-                                    <span class="text-sm font-bold text-slate-700">${p.nombre}</span>
-                                </div>
-                                <span class="text-[10px] font-black text-indigo-500 bg-white px-2 py-1 rounded-md shadow-sm">
-                                    ${p.votos} VOTOS
-                                </span>
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
-                grid.appendChild(card);
-            }
-        } else {
-            grid.innerHTML = '<p class="col-span-full text-center text-slate-400 py-10">No hay votos registrados el día de hoy.</p>';
+            const histRes = await fetch(API_URL + "?action=get_stats");
+            const histData = await histRes.json();
+            const ctx = document.getElementById('statsChart').getContext('2d');
+            if (window.chartObj) window.chartObj.destroy();
+            window.chartObj = new Chart(ctx, {
+                type: 'bar',
+                data: { labels: Object.keys(histData.stats), datasets: [{ label: 'Votos', data: Object.values(histData.stats), backgroundColor: '#6366f1', borderRadius: 5 }] },
+                options: { indexAxis: 'y', plugins: { legend: { display: false } } }
+            });
         }
-    } catch (e) {
-        grid.innerHTML = '<p class="col-span-full text-center text-red-400 py-10">Error de conexión con el servidor.</p>';
-    }
-
-    // El gráfico histórico se mantiene al final
-    const histRes = await fetch(API_URL + "?action=get_stats");
-    const histData = await histRes.json();
-    const ctx = document.getElementById('statsChart').getContext('2d');
-    if (window.chartObj) window.chartObj.destroy();
-    window.chartObj = new Chart(ctx, {
-        type: 'bar',
-        data: { 
-            labels: Object.keys(histData.stats), 
-            datasets: [{ 
-                label: 'Votos Acumulados', 
-                data: Object.values(histData.stats), 
-                backgroundColor: '#6366f1',
-                borderRadius: 5
-            }] 
-        },
-        options: { indexAxis: 'y', plugins: { legend: { display: false } } }
-    });
-}
 
         function logout() { localStorage.removeItem('buffet_session'); location.reload(); }
     </script>
