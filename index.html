@@ -121,7 +121,7 @@
     </div>
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbyhyF-37uxttmL-uCjTktKluanr6qENP1OklgaVEw0vpbR_aIthk6gbyBKTs-SC5FM/exec"; 
+        const API_URL = "https://script.google.com/macros/s/AKfycbwmF7Lh7R7QWqF09XiwM5QL_EWGlWWAkQ_pUknVsokgz8fXa-qw8_VV1MocdAHgHmg/exec"; 
         let currentUser = JSON.parse(localStorage.getItem('buffet_session'));
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -143,7 +143,38 @@
             } else { alert("❌ " + data.message); }
         }
 
-        function loginSuccess(session) {
+       function loginSuccess(session) {
+    currentUser = session;
+    
+    // VALIDACIÓN DE HORARIO PRONTIS
+    const ahora = new Date();
+    const hora = ahora.getHours();
+    const min = ahora.getMinutes();
+    const tiempoDecimal = hora + (min / 60);
+
+    // Ventana permitida: >= 13:00 (13.0) O < 08:30 (8.5)
+    const estaEnHorario = (tiempoDecimal >= 13) || (tiempoDecimal < 8.5);
+
+    if (!estaEnHorario && session.rol !== 'ADMIN') {
+        document.getElementById('login-screen').innerHTML = `
+            <div class="text-center p-8 bg-white rounded-2xl shadow-xl">
+                <h1 class="text-4xl mb-4">🔒</h1>
+                <h2 class="text-xl font-bold text-slate-800">Sistema Cerrado</h2>
+                <p class="text-slate-500 mt-2 text-sm">Las votaciones y resultados están disponibles de <br> 
+                   <span class="font-bold text-indigo-600 text-lg">13:00 PM a 08:30 AM</span></p>
+                <button onclick="location.reload()" class="mt-6 text-indigo-500 text-xs underline">Reintentar</button>
+            </div>
+        `;
+        return;
+    }
+
+    // Si está en horario o es ADMIN, procede normal
+    document.getElementById('login-screen').classList.add('hidden');
+    document.getElementById('app-container').classList.remove('hidden');
+    document.getElementById('welcome-msg').innerText = `👋 Hola, ${session.nombre}`;
+    if (session.rol === 'ADMIN') document.getElementById('admin-nav').classList.remove('hidden');
+    fetchData();
+
             currentUser = session;
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('app-container').classList.remove('hidden');
