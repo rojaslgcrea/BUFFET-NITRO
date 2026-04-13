@@ -342,27 +342,22 @@
             // LÓGICA DE HORARIO: 13:00 (13.0) a 16:40 (16.66) - No cambiada
             const estaEnHorario = (tiempoDecimal >= 13) && (tiempoDecimal <= 16.66);
 
-            if ((id === 'votar' || id === 'resultado') && !estaEnHorario && currentUser.rol !== 'ADMIN') {
-                const containerId = id === 'votar' ? 'voto-dinamico-container' : 'resultados-grid';
-                const container = document.getElementById(containerId);
-                if (container) {
-                    container.innerHTML = `
-                        <div class="col-span-full glass-card p-10 text-center border-white/20">
-                            <p class="text-5xl mb-4">🙄</p>
-                            <h3 class="text-2xl font-black text-slate-800 mb-2 uppercase tracking-tight">¡AH! ¿AHORA SI QUIERES VOTAR?</h3>
-                            <p class="text-slate-600 font-medium italic text-sm">Espera el horario establecido, colega.</p>
-                            <div class="mt-6 inline-block bg-purple-800 px-4 py-2 rounded-full text-xs font-bold text-white uppercase tracking-widest shadow-md">
-                                Horario: 13:00 PM - 16:40 PM
-                            </div>
-                        </div>
-                    `;
-                    if(id === 'resultado') {
-                        const canvasElement = document.getElementById('statsChart');
-                        if(canvasElement) canvasElement.parentElement.classList.add('hidden');
-                    }
-                }
-                return; 
-            }
+            if (id === 'votar' && !estaEnHorario && currentUser.rol !== 'ADMIN') {
+    const container = document.getElementById('voto-dinamico-container');
+    if (container) {
+        container.innerHTML = `
+            <div class="col-span-full glass-card p-10 text-center border-white/20">
+                <p class="text-5xl mb-4">🙄</p>
+                <h3 class="text-2xl font-black text-slate-800 mb-2 uppercase tracking-tight">¡AH! ¿AHORA SI QUIERES VOTAR?</h3>
+                <p class="text-slate-600 font-medium italic text-sm">Espera el horario establecido, colega.</p>
+                <div class="mt-6 inline-block bg-purple-800 px-4 py-2 rounded-full text-xs font-bold text-white uppercase tracking-widest shadow-md">
+                    Horario: 13:00 PM - 16:40 PM
+                </div>
+            </div>
+        `;
+    }
+    return; // Detenemos la ejecución solo para la pestaña Votar
+}
 
             if(id === 'resultado') {
                 const canvasElement = document.getElementById('statsChart');
