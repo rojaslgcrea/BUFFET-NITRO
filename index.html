@@ -223,7 +223,10 @@
                     const userData = await userRes.json();
                     renderUsers(userData.users);
                 }
-            } catch (e) { console.error("Error al cargar datos."); }
+            } catch (e) {
+        console.error("Error detallado:", e); // Esto te dirá qué falló exactamente en la consola
+        grid.innerHTML = '<p class="col-span-full text-center text-red-400 py-10 glass-card rounded-2xl">Error de sincronización con el servidor.</p>';
+    }
         }
 
         function renderMenu(menu) {
@@ -377,7 +380,7 @@
 
         async function renderStats() {
     const grid = document.getElementById('resultados-grid');
-    const ultimaComidaCont = document.getElementById('ultima-comida-container');
+    const ultimaComidaCont = document.getElementById('ultima-comida-card');
     
     grid.innerHTML = '<p class="col-span-full text-center text-purple-900 py-10 animate-bounce font-bold glass-card rounded-2xl border-white/30">Calculando podios...</p>';
 
