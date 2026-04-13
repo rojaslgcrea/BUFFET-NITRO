@@ -200,7 +200,7 @@
     </div>
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycby_MDZMaCd1JP20Hep8K1aiKzDshGomr_kDsoNZHVguqzhjCHrPu9uTxryIjDTyz4k/exec"; 
+        const API_URL = "https://script.google.com/macros/s/AKfycbxmbTL1TZpcVOCFxRw1VTuE7zdSg-d9n4djw6sqCU0Au78sXIeBqMa7MuSxecpBM0o/exec"; 
         let currentUser = JSON.parse(localStorage.getItem('buffet_session'));
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -272,13 +272,21 @@
         async function enviarVotos() {
             const formData = new FormData(document.getElementById('voteForm'));
             const selecciones = Object.fromEntries(formData);
-            if (Object.values(selecciones).some(v => v === "")) return alert("⚠️ Selecciona una opción.");
+            if (Object.values(selecciones).some(v => v === "")) return alert("⚠️ Selecciona una opción por categoría antes de enviar.");
+            
             const res = await fetch(API_URL, {
                 method: 'POST',
                 body: JSON.stringify({ action: 'votar', usuario: currentUser.usuario, selecciones })
             });
             const data = await res.json();
-            alert(data.message);
+            
+            if (data.success) {
+                alert("✅ Voto registrado exitosamente.");
+                mostrarMensajeYaVoto(); 
+            } else {
+                alert(data.message);
+                if (data.message.includes("Ya registraste")) mostrarMensajeYaVoto();
+            }
         }
 
         async function cargarPropuestasParaVotar() {
@@ -361,12 +369,18 @@
             const ahora = new Date(), hora = ahora.getHours(), min = ahora.getMinutes(), tiempoDecimal = hora + (min / 60);
             const estaEnHorario = (tiempoDecimal >= 13) && (tiempoDecimal <= 16.66);
 
-            if (id === 'votar' && !estaEnHorario && currentUser.rol !== 'ADMIN') {
-                const container = document.getElementById('voto-dinamico-container');
-                if (container) {
-                    container.innerHTML = `<div class="col-span-full glass-card p-10 text-center border-white/20"><p class="text-5xl mb-4">🙄</p><h3 class="text-2xl font-black text-slate-800 mb-2 uppercase">¡AH! ¿AHORA SI QUIERES VOTAR?</h3><p class="text-slate-600 font-medium italic text-sm">Espera el horario establecido.</p><div class="mt-6 inline-block bg-purple-800 px-4 py-2 rounded-full text-xs font-bold text-white uppercase shadow-md">Horario: 13:00 PM - 16:40 PM</div></div>`;
+            if (id === 'votar') {
+                if (!estaEnHorario && currentUser.rol !== 'ADMIN') {
+                    const container = document.getElementById('voto-dinamico-container');
+                    if (container) {
+                        container.innerHTML = `<div class="col-span-full glass-card p-10 text-center border-white/20"><p class="text-5xl mb-4">🙄</p><h3 class="text-2xl font-black text-slate-800 mb-2 uppercase">¡AH! ¿AHORA SI QUIERES VOTAR?</h3><p class="text-slate-600 font-medium italic text-sm">Espera el horario establecido, colega.</p><div class="mt-6 inline-block bg-purple-800 px-4 py-2 rounded-full text-xs font-bold text-white uppercase shadow-md">Horario: 13:00 PM - 16:40 PM</div></div>`;
+                    }
+                    return;
+                } else {
+                    fetch(API_URL + "?action=check_voto_usuario&usuario=" + currentUser.usuario)
+                        .then(res => res.json())
+                        .then(data => { if (data.yaVoto) mostrarMensajeYaVoto(); });
                 }
-                return;
             }
 
             if(id === 'resultado') renderStats();
@@ -456,6 +470,24 @@
             if(data.success) fetchData();
         }
 
+        function mostrarMensajeYaVoto() {
+            const container = document.getElementById('voto-dinamico-container');
+            if (container) {
+                container.innerHTML = `
+                    <div class="col-span-full glass-card p-10 text-center border-white/20 animate-all-suave">
+                        <p class="text-6xl mb-4">🤨</p>
+                        <h3 class="text-2xl font-black text-slate-800 mb-2 uppercase tracking-tight">¡No seas vivo, YA VOTASTE COLEGA!</h3>
+                        <p class="text-slate-600 font-medium italic text-sm">Tu elección ya está en manos del chef. No puedes votar dos veces en el mismo ciclo.</p>
+                        <div class="mt-8 inline-block bg-purple-900 px-6 py-3 rounded-full text-xs font-bold text-white uppercase tracking-widest shadow-lg">
+                            Puedes volver a votar mañana a las 13:00 PM
+                        </div>
+                    </div>
+                `;
+                const btn = document.getElementById('btn-votar');
+                if(btn) btn.classList.add('hidden');
+            }
+        }
+        
         function logout() { localStorage.removeItem('buffet_session'); location.reload(); }
     </script>
 </body>
