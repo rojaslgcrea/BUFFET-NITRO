@@ -1,412 +1,97 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buffet Nitro - Sistema de Gestión</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        /* ESTILOS CSS PERSONALIZADOS (Prontis Aesthetic) */
+async function renderStats() {
+    const grid = document.getElementById('resultados-grid');
+    const ultimaComidaCont = document.getElementById('ultima-comida-container');
+    
+    grid.innerHTML = '<p class="col-span-full text-center text-purple-900 py-10 animate-bounce font-bold glass-card rounded-2xl border-white/30">Calculando podios...</p>';
+
+    try {
+        // --- NUEVA PARTE: Cargar Última Comida Realizada ---
+        const resAnterior = await fetch(API_URL + "?action=get_ultima_comida");
+        const jsonAnterior = await resAnterior.json();
         
-        /* 1. Fondo Machu Picchu Natural (Sin filtros de color) */
-        body {
-            background-image: url('https://cdn.pixabay.com/photo/2012/04/26/22/48/machu-picchu-43387_1280.jpg');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            background-repeat: no-repeat;
-        }
-
-        /* 2. Efecto Cristal (Glassmorphism) Serio */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.4); /* Transparencia equilibrada */
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
-        }
-
-        /* 3. Animaciones Suaves Globales */
-        .transition-all-suave {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        /* 4. Efectos Hover Microinteracciones */
-        .hover-elevate:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-        }
-        
-        .hover-scale:hover {
-            transform: scale(1.02);
-        }
-
-        /* 5. Utilidades y Tabs */
-        .active-tab { border-bottom: 3px solid #6b21a8; font-weight: bold; color: #6b21a8; } /* Morado serio */
-        .hidden { display: none; }
-        
-        /* Scrollbar minimalista para áreas de glassmorphism */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.1); }
-        ::-webkit-scrollbar-thumb { background: rgba(107, 33, 168, 0.3); border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(107, 33, 168, 0.5); }
-    </style>
-</head>
-<body class="min-h-screen font-sans text-slate-900">
-
-    <div id="login-screen" class="flex flex-col items-center justify-center min-h-screen p-4">
-        <div class="glass-card p-5 mb-20 rounded-3xl flex items-center justify-center border border-white/30 shadow-2xl">
-    <img src="https://nitro-tienda.com/web/image/website/1/logo/Nitro?unique=6d3069e" alt="Logo Nitro" class="h-14">
-</div>
-        
-        <div class="glass-card p-10 w-full max-w-md border border-white/20 transition-all-suave hover-elevate">
-            <h1 class="text-2xl font-black text-center text-slate-800 mb-8 tracking-tighter uppercase">Gestión de Comedor</h1>
-            <div class="space-y-5">
-                <input type="text" id="user-input" placeholder="Usuario" class="w-full p-4 bg-white/60 border border-white/30 rounded-xl outline-none focus:ring-2 focus:ring-purple-400 transition-all-suave">
-                <input type="password" id="pass-input" placeholder="Contraseña" class="w-full p-4 bg-white/60 border border-white/30 rounded-xl outline-none focus:ring-2 focus:ring-purple-400 transition-all-suave">
-                <button onclick="handleLogin()" class="w-full bg-purple-800 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-purple-900 transition-all-suave transform hover:scale-[1.03]">INGRESAR</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="app-container" class="hidden">
-        <nav class="bg-white/10 backdrop-blur-lg text-slate-800 shadow-xl sticky top-0 z-50 border-b border-white/20">
-            <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-                <div class="flex items-center gap-4">
-                    <img src="https://nitro-tienda.com/web/image/website/1/logo/Nitro?unique=6d3069e" alt="Logo Nitro" class="h-9">
-                    <span class="font-medium text-xs text-purple-100 italic" id="welcome-msg"></span>
-                </div>
-                <div class="flex space-x-1 md:space-x-3 text-[10px] md:text-xs font-bold uppercase tracking-wider">
-                    <button onclick="showSection('votar')" id="tab-votar" class="nav-link py-2 px-3 rounded-lg hover:bg-white/5 transition-all-suave">Votar</button>
-                    <button onclick="showSection('proponer')" id="tab-proponer" class="nav-link py-2 px-3 rounded-lg hover:bg-white/5 transition-all-suave">Propuestas</button>
-                    <button onclick="showSection('resultado')" id="tab-resultado" class="nav-link py-2 px-3 rounded-lg hover:bg-white/5 transition-all-suave">Resultados</button>
-                    <button id="admin-nav" onclick="showSection('admin')" class="nav-link py-2 px-3 rounded-lg hidden hover:bg-white/5 transition-all-suave">Admin</button>
-                    <button onclick="logout()" class="text-purple-300 border-l border-purple-800 pl-3 hover:text-white transition-all-suave">Salir</button>
-                </div>
-            </div>
-        </nav>
-
-        <main class="max-w-7xl mx-auto p-4 md:p-10">
-            
-            <section id="votar" class="section-content">
-                <header class="mb-10">
-                    <h2 class="text-4xl font-black text-slate-800 tracking-tighter">Menú de Mañana</h2>
-                    <p class="text-slate-600 text-sm mt-1">Selecciona tus preferencias para el mini-bufet.</p>
-                </header>
-                <div id="voto-dinamico-container" class="space-y-10">
-                    <form id="voteForm" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3"></form>
-                    <button id="btn-votar" onclick="enviarVotos()" class="w-full max-w-xl mx-auto block bg-purple-800 text-white font-bold py-5 rounded-2xl shadow-xl hover:bg-purple-900 transition-all-suave transform hover:scale-[1.02] flex items-center justify-center gap-3">
-                        <span class="text-xl">🚀</span> ENVIAR MI ELECCIÓN
-                    </button>
-                </div>
-            </section>
-
-            <section id="proponer" class="section-content hidden">
-                <div class="grid gap-10 md:grid-cols-2">
-                    <div>
-                        <h2 class="text-3xl font-bold mb-6 text-slate-800 tracking-tight">Nueva Propuesta</h2>
-                        <div class="glass-card p-8 space-y-5 transition-all-suave hover-elevate">
-                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Categoría</label>
-                            <select id="prop-cat" class="w-full p-4 bg-white/60 border border-white/30 rounded-xl focus:ring-2 focus:ring-purple-400 transition-all-suave"></select>
-                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Nombre del Plato</label>
-                            <input type="text" id="prop-nombre" placeholder="¿Qué plato sugieres?" class="w-full p-4 bg-white/60 border border-white/30 rounded-xl focus:ring-2 focus:ring-purple-400 transition-all-suave">
-                            <button onclick="subirPropuesta()" class="w-full bg-purple-800 text-white font-bold py-4 rounded-xl hover:bg-purple-900 transition-all-suave">POSTULAR PLATO</button>
-                        </div>
+        if (jsonAnterior.success && Object.keys(jsonAnterior.menuAnterior).length > 0) {
+            ultimaComidaCont.classList.remove('hidden');
+            ultimaComidaCont.innerHTML = `
+                <div class="glass-card p-6 border-white/40 border-2 transition-all-suave hover-elevate">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="text-2xl">🍽️</span>
+                        <h3 class="font-black text-slate-800 uppercase tracking-tighter">Última Comida Realizada</h3>
                     </div>
-                    <div>
-                        <div class="flex justify-between items-end mb-6">
-                            <h2 class="text-3xl font-bold text-slate-800 tracking-tight">Apoyar Ideas</h2>
-                            <span class="text-[10px] bg-purple-100 text-purple-800 px-3 py-1.5 rounded-full font-bold uppercase tracking-tighter">2 Votos Semanales</span>
-                        </div>
-                        <div id="lista-propuestas" class="space-y-4 max-h-[600px] overflow-y-auto pr-3">
-                            <p class="text-center text-slate-500 py-10 animate-pulse glass-card rounded-2xl">Cargando propuestas...</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section id="resultado" class="section-content hidden">
-                <header class="mb-10 flex justify-between items-end gap-4">
-                    <div>
-                        <h2 class="text-4xl font-black text-slate-800 tracking-tighter">Resultados del Día</h2>
-                        <p class="text-slate-600 text-sm mt-1">Opciones ganadoras para mañana (Ciclo 13:00 - 16:40).</p>
-                    </div>
-                    <button onclick="renderStats()" class="bg-purple-100 text-purple-800 px-5 py-3 rounded-xl text-xs font-bold hover:bg-purple-200 transition-all-suave flex items-center gap-2 whitespace-nowrap">
-                        REFRESCAR ↻
-                    </button>
-                </header>
-                <div id="resultados-grid" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-12"></div>
-                
-                <div class="mt-12 glass-card p-8 transition-all-suave hover-elevate">
-                    <h3 class="font-bold text-slate-500 uppercase text-[10px] mb-6 tracking-widest">Acumulado Histórico</h3>
-                    <div class="h-[400px]">
-                        <canvas id="statsChart"></canvas>
-                    </div>
-                </div>
-            </section>
-
-            <section id="admin" class="section-content hidden">
-                <h2 class="text-3xl font-bold mb-8 italic text-purple-800 tracking-tight">Panel de Control RRHH</h2>
-                <div class="mb-10">
-                    <h3 class="font-bold text-slate-500 text-xs uppercase mb-4 tracking-widest">Gestión de Personal</h3>
-                    <div class="glass-card rounded-2xl overflow-hidden transition-all-suave hover-elevate">
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left text-sm">
-                                <thead class="bg-purple-950/5 text-purple-900 font-bold uppercase text-[10px]">
-                                    <tr><th class="p-5">Usuario</th><th class="p-5">Nombre</th><th class="p-5">Rol</th><th class="p-5 text-center">Acción</th></tr>
-                                </thead>
-                                <tbody id="userTableBody" class="bg-white/30"></tbody>
-                            </table>
-                        </div>
-                        <div class="p-5 bg-white/20 border-t border-white/20 flex flex-wrap gap-3">
-                            <input type="text" id="nu" placeholder="Usuario" class="p-3 bg-white/60 border border-white/30 rounded-xl text-sm flex-1 focus:ring-2 focus:ring-purple-400 outline-none">
-                            <input type="text" id="nc" placeholder="Clave" class="p-3 bg-white/60 border border-white/30 rounded-xl text-sm flex-1 focus:ring-2 focus:ring-purple-400 outline-none">
-                            <input type="text" id="nn" placeholder="Nombre" class="p-3 bg-white/60 border border-white/30 rounded-xl text-sm flex-1 focus:ring-2 focus:ring-purple-400 outline-none">
-                            <select id="nr" class="p-3 bg-white/60 border border-white/30 rounded-xl text-sm focus:ring-2 focus:ring-purple-400 outline-none"><option value="USER">USER</option><option value="ADMIN">ADMIN</option></select>
-                            <button onclick="addUser()" class="bg-purple-800 text-white px-6 py-3 rounded-xl font-bold text-sm w-full md:w-auto hover:bg-purple-900 transition-all-suave">Añadir Colaborador</button>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </main>
-    </div>
-
-    <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbwG3MZT6FjsSulWrSW0e2R8mFK6wFVlIwUphdC4T6cesCwsZLymwMqPcdTbccvszO0/exec"; 
-        let currentUser = JSON.parse(localStorage.getItem('buffet_session'));
-
-        document.addEventListener('DOMContentLoaded', () => {
-            if (currentUser) loginSuccess(currentUser);
-        });
-
-        async function handleLogin() {
-            const usuario = document.getElementById('user-input').value;
-            const clave = document.getElementById('pass-input').value;
-            const res = await fetch(API_URL, {
-                method: 'POST',
-                body: JSON.stringify({ action: 'login', usuario, clave })
-            });
-            const data = await res.json();
-            if (data.success) {
-                const session = { usuario, nombre: data.nombre, rol: data.rol };
-                localStorage.setItem('buffet_session', JSON.stringify(session));
-                loginSuccess(session);
-            } else { alert("❌ " + data.message); }
-        }
-
-        function loginSuccess(session) {
-            currentUser = session;
-            document.getElementById('login-screen').classList.add('hidden');
-            document.getElementById('app-container').classList.remove('hidden');
-            document.getElementById('welcome-msg').innerText = `👋 Hola, ${session.nombre}`;
-            if (session.rol === 'ADMIN') document.getElementById('admin-nav').classList.remove('hidden');
-            fetchData();
-            showSection('votar'); 
-        }
-
-        async function fetchData() {
-            try {
-                const res = await fetch(API_URL + "?action=get_opciones");
-                const json = await res.json();
-                renderMenu(json.data);
-                if (currentUser.rol === 'ADMIN') {
-                    const userRes = await fetch(API_URL + "?action=get_usuarios");
-                    const userData = await userRes.json();
-                    renderUsers(userData.users);
-                }
-            } catch (e) { console.error("Error al cargar datos."); }
-        }
-
-        function renderMenu(menu) {
-            const form = document.getElementById('voteForm');
-            const propCat = document.getElementById('prop-cat');
-            
-            // Limpiamos solo si los elementos existen en el momento
-            if (form) form.innerHTML = ''; 
-            if (propCat) propCat.innerHTML = '';
-            
-            for (const cat in menu) {
-                // Si el formulario de votos existe (estamos en horario), lo llenamos
-                if (form) {
-                    const div = document.createElement('div');
-                    div.className = "glass-card p-6 border border-white/30 transition-all-suave hover-elevate";
-                    div.innerHTML = `<label class="block font-black mb-3 text-purple-900 text-[10px] uppercase tracking-widest">${cat}</label>
-                        <select name="${cat}" class="w-full p-3 bg-white/60 border border-white/30 rounded-xl outline-none focus:ring-2 focus:ring-purple-400 transition-all-suave" required>
-                        <option value="">Seleccionar...</option>
-                        ${menu[cat].map(o => `<option value="${o}">${o}</option>`).join('')}</select>`;
-                    form.appendChild(div);
-                }
-                
-                // Las categorías de PROPUESTAS se llenan SIEMPRE
-                if (propCat) {
-                    propCat.innerHTML += `<option value="${cat}">${cat}</option>`;
-                }
-            }
-        }
-
-        async function enviarVotos() {
-            const formData = new FormData(document.getElementById('voteForm'));
-            const selecciones = Object.fromEntries(formData);
-            if (Object.values(selecciones).some(v => v === "")) return alert("⚠️ Selecciona una opción por categoría.");
-            const res = await fetch(API_URL, {
-                method: 'POST',
-                body: JSON.stringify({ action: 'votar', usuario: currentUser.usuario, selecciones })
-            });
-            const data = await res.json();
-            alert(data.message);
-        }
-
-        async function cargarPropuestasParaVotar() {
-            const container = document.getElementById('lista-propuestas');
-            container.innerHTML = '<p class="text-center text-slate-500 py-10 text-sm animate-pulse glass-card rounded-2xl">Actualizando lista...</p>';
-            try {
-                const res = await fetch(API_URL + "?action=get_propuestas");
-                const json = await res.json();
-                if(json.success && json.propuestas.length > 0) {
-                    container.innerHTML = '';
-                    json.propuestas.forEach(p => {
-                        const div = document.createElement('div');
-                        div.className = "glass-card p-4 flex justify-between items-center transition-all-suave hover-scale";
-                        div.innerHTML = `
-                            <div class="flex-1">
-                                <p class="text-[9px] font-bold text-purple-800 uppercase tracking-wider">${p.categoria}</p>
-                                <p class="font-bold text-slate-800 text-sm">${p.nombre}</p>
-                                <p class="text-[9px] text-slate-500 mt-1">Por: ${p.autor} | ${p.votos} Apoyos</p>
+                    <div class="flex flex-wrap gap-3">
+                        ${Object.entries(jsonAnterior.menuAnterior).map(([cat, plato]) => `
+                            <div class="bg-white/40 px-3 py-2 rounded-lg border border-white/20">
+                                <span class="text-purple-900 block text-[9px] font-black uppercase">${cat}</span>
+                                <span class="text-slate-800 text-sm font-bold">${plato}</span>
                             </div>
-                            <button onclick="apoyarPropuesta(${p.id})" class="bg-purple-100 text-purple-900 px-4 py-2 rounded-lg text-[10px] font-black hover:bg-purple-800 hover:text-white transition uppercase tracking-widest">Apoyar</button>`;
-                        container.appendChild(div);
-                    });
-                } else { container.innerHTML = '<p class="text-center text-slate-500 py-10 text-sm italic glass-card rounded-2xl">Sin propuestas esta semana.</p>'; }
-            } catch (e) { container.innerHTML = '<p class="text-center text-red-400 py-10 text-xs font-bold glass-card rounded-2xl">Error de sincronización.</p>'; }
-        }
-
-        async function apoyarPropuesta(filaId) {
-            if(!confirm("¿Deseas usar uno de tus 2 apoyos semanales?")) return;
-            const res = await fetch(API_URL, {
-                method: 'POST',
-                body: JSON.stringify({ action: 'votar_propuesta', usuario: currentUser.usuario, filaPropuesta: filaId })
-            });
-            const data = await res.json();
-            alert(data.message);
-            if(data.success) cargarPropuestasParaVotar();
-        }
-
-        async function subirPropuesta() {
-            const categoria = document.getElementById('prop-cat').value;
-            const nombre = document.getElementById('prop-nombre').value;
-            if(!nombre) return alert("Escribe el nombre del plato.");
-            const res = await fetch(API_URL, {
-                method: 'POST',
-                body: JSON.stringify({ action: 'proponer', usuario: currentUser.usuario, categoria, nombre })
-            });
-            const data = await res.json();
-            alert(data.message);
-            if(data.success) { document.getElementById('prop-nombre').value = ''; cargarPropuestasParaVotar(); }
-        }
-
-        function renderUsers(users) {
-            const tbody = document.getElementById('userTableBody');
-            tbody.innerHTML = users.map(u => `
-                <tr class="border-b border-white/10 hover:bg-white/10 transition">
-                    <td class="p-5 font-bold text-slate-800">${u[0]}</td><td class="p-5 text-slate-700">${u[2]}</td><td class="p-5"><span class="px-2 py-1 rounded text-[10px] font-bold ${u[3] === 'ADMIN' ? 'bg-purple-200 text-purple-900' : 'bg-slate-100 text-slate-600'}">${u[3]}</span></td>
-                    <td class="p-5 text-center"><button onclick="deleteUser('${u[0]}')" class="text-red-500 hover:text-red-700 font-bold text-xs uppercase tracking-widest">Eliminar</button></td>
-                </tr>`).join('');
-        }
-
-        async function addUser() {
-            const u = document.getElementById('nu').value, c = document.getElementById('nc').value, n = document.getElementById('nn').value, r = document.getElementById('nr').value;
-            if(!u || !c || !n) return alert("Completa los datos del nuevo colaborador.");
-            await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'crud_usuarios', subAction: 'agregar', u, c, n, r }) });
-            fetchData();
-        }
-
-        async function deleteUser(u) {
-            if (!confirm(`¿Eliminar al colaborador ${u}?`)) return;
-            await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'crud_usuarios', subAction: 'eliminar', u }) });
-            fetchData();
-        }
-
-        function showSection(id) {
-            document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden'));
-            document.getElementById(id).classList.remove('hidden');
-            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active-tab'));
-            const tab = document.getElementById('tab-' + id);
-            if(tab) tab.classList.add('active-tab');
-
-            const ahora = new Date();
-            const hora = ahora.getHours();
-            const min = ahora.getMinutes();
-            const tiempoDecimal = hora + (min / 60);
-            
-            // LÓGICA DE HORARIO: 13:00 (13.0) a 16:40 (16.66) - No cambiada
-            const estaEnHorario = (tiempoDecimal >= 13) && (tiempoDecimal <= 16.66);
-
-            if (id === 'votar' && !estaEnHorario && currentUser.rol !== 'ADMIN') {
-    const container = document.getElementById('voto-dinamico-container');
-    if (container) {
-        container.innerHTML = `
-            <div class="col-span-full glass-card p-10 text-center border-white/20">
-                <p class="text-5xl mb-4">🙄</p>
-                <h3 class="text-2xl font-black text-slate-800 mb-2 uppercase tracking-tight">¡AH! ¿AHORA SI QUIERES VOTAR?</h3>
-                <p class="text-slate-600 font-medium italic text-sm">Espera el horario establecido, colega.</p>
-                <div class="mt-6 inline-block bg-purple-800 px-4 py-2 rounded-full text-xs font-bold text-white uppercase tracking-widest shadow-md">
-                    Horario: 13:00 PM - 16:40 PM
+                        `).join('')}
+                    </div>
                 </div>
-            </div>
-        `;
-    }
-    return; // Detenemos la ejecución solo para la pestaña Votar
-}
+            `;
+        }
 
-            if(id === 'resultado') {
-                const canvasElement = document.getElementById('statsChart');
-                if(canvasElement) canvasElement.parentElement.classList.remove('hidden');
-                renderStats();
+        // --- TU CÓDIGO ORIGINAL: Resultados del Día ---
+        const res = await fetch(API_URL + "?action=get_resultados_dia");
+        const json = await res.json();
+
+        if (json.success && Object.keys(json.resultados).length > 0) {
+            grid.innerHTML = '';
+            for (const categoria in json.resultados) {
+                const card = document.createElement('div');
+                card.className = "glass-card p-6 flex flex-col h-full border border-white/30 transition-all-suave hover-elevate";
+                card.innerHTML = `
+                    <div class="mb-4">
+                        <span class="bg-purple-100 text-purple-900 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">${categoria}</span>
+                    </div>
+                    <div class="space-y-4 flex-grow">
+                        ${json.resultados[categoria].map((p, index) => `
+                            <div class="flex justify-between items-center p-3 rounded-xl transition ${index === 0 ? 'bg-purple-800/80 text-white shadow-lg' : 'bg-white/40 text-slate-800'}">
+                                <div class="flex items-center gap-3">
+                                    <span class="text-xl">${index === 0 ? '🥇' : '🥈'}</span>
+                                    <span class="text-sm font-bold">${p.nombre}</span>
+                                </div>
+                                <span class="text-[10px] font-black px-2 py-1 rounded-md shadow-inner ${index === 0 ? 'bg-white/20 text-white' : 'bg-white/80 text-purple-900'}">
+                                    ${p.votos} VOTOS
+                                </span>
+                            </div>`).join('')}
+                    </div>`;
+                grid.appendChild(card);
             }
-            if(id === 'proponer') cargarPropuestasParaVotar();
+        } else {
+            grid.innerHTML = '<p class="col-span-full text-center text-slate-500 py-10 glass-card rounded-2xl">No hay votos registrados.</p>';
         }
 
-        async function renderStats() {
-            const grid = document.getElementById('resultados-grid');
-            grid.innerHTML = '<p class="col-span-full text-center text-purple-900 py-10 animate-bounce font-bold glass-card rounded-2xl border-white/30">Calculando podios...</p>';
-            try {
-                const res = await fetch(API_URL + "?action=get_resultados_dia");
-                const json = await res.json();
-                if (json.success && Object.keys(json.resultados).length > 0) {
-                    grid.innerHTML = '';
-                    for (const categoria in json.resultados) {
-                        const card = document.createElement('div');
-                        card.className = "glass-card p-6 flex flex-col h-full border border-white/30 transition-all-suave hover-elevate";
-                        card.innerHTML = `
-                            <div class="mb-4"><span class="bg-purple-100 text-purple-900 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">${categoria}</span></div>
-                            <div class="space-y-4 flex-grow">${json.resultados[categoria].map((p, index) => `
-                                <div class="flex justify-between items-center p-3 rounded-xl transition ${index === 0 ? 'bg-purple-800/80 text-white shadow-lg' : 'bg-white/40 text-slate-800'}">
-                                    <div class="flex items-center gap-3"><span class="text-xl">${index === 0 ? '🥇' : '🥈'}</span><span class="text-sm font-bold">${p.nombre}</span></div>
-                                    <span class="text-[10px] font-black px-2 py-1 rounded-md shadow-inner ${index === 0 ? 'bg-white/20 text-white' : 'bg-white/80 text-purple-900'}">${p.votos} VOTOS</span>
-                                </div>`).join('')}</div>`;
-                        grid.appendChild(card);
-                    }
-                } else { grid.innerHTML = '<p class="col-span-full text-center text-slate-500 py-10 glass-card rounded-2xl">No hay votos registrados.</p>'; }
-            } catch (e) { grid.innerHTML = '<p class="col-span-full text-center text-red-400 py-10 glass-card rounded-2xl">Error de conexión.</p>'; }
+    } catch (e) {
+        grid.innerHTML = '<p class="col-span-full text-center text-red-400 py-10 glass-card rounded-2xl">Error de conexión.</p>';
+    }
 
-            const histRes = await fetch(API_URL + "?action=get_stats");
-            const histData = await histRes.json();
-            const ctx = document.getElementById('statsChart').getContext('2d');
-            
-            // Configuración seria para Chart.js
-            Chart.defaults.color = '#475569'; // slate-600
-            Chart.defaults.font.family = 'ui-sans-serif, system-ui, sans-serif';
+    // --- TU CÓDIGO ORIGINAL: Gráfico Histórico ---
+    const histRes = await fetch(API_URL + "?action=get_stats");
+    const histData = await histRes.json();
+    const ctx = document.getElementById('statsChart').getContext('2d');
+    
+    Chart.defaults.color = '#475569';
+    Chart.defaults.font.family = 'ui-sans-serif, system-ui, sans-serif';
 
-            if (window.chartObj) window.chartObj.destroy();
-            window.chartObj = new Chart(ctx, {
-                type: 'bar',
-                data: { labels: Object.keys(histData.stats), datasets: [{ label: 'Votos', data: Object.values(histData.stats), backgroundColor: 'rgba(107, 33, 168, 0.7)', borderColor: '#6b21a8', borderWidth: 1, borderRadius: 8 }] },
-                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } }, y: { grid: { color: 'rgba(255,255,255,0.1)' } } } }
-            });
+    if (window.chartObj) window.chartObj.destroy();
+    window.chartObj = new Chart(ctx, {
+        type: 'bar',
+        data: { 
+            labels: Object.keys(histData.stats), 
+            datasets: [{ 
+                label: 'Votos', 
+                data: Object.values(histData.stats), 
+                backgroundColor: 'rgba(107, 33, 168, 0.7)', 
+                borderColor: '#6b21a8', 
+                borderWidth: 1, 
+                borderRadius: 8 
+            }] 
+        },
+        options: { 
+            indexAxis: 'y', 
+            responsive: true, 
+            maintainAspectRatio: false, 
+            plugins: { legend: { display: false } }, 
+            scales: { x: { grid: { display: false } }, y: { grid: { color: 'rgba(255,255,255,0.1)' } } } 
         }
-
-        function logout() { localStorage.removeItem('buffet_session'); location.reload(); }
-    </script>
-</body>
-</html>
+    });
+}
