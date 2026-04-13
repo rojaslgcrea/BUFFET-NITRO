@@ -9,7 +9,7 @@
     <style>
         /* ESTILOS CSS PERSONALIZADOS (Prontis Aesthetic) */
         
-        /* 1. Fondo Machu Picchu Natural (Sin filtros de color) */
+        /* 1. Fondo Machu Picchu Natural */
         body {
             background-image: url('https://cdn.pixabay.com/photo/2012/04/26/22/48/machu-picchu-43387_1280.jpg');
             background-size: cover;
@@ -20,7 +20,7 @@
 
         /* 2. Efecto Cristal (Glassmorphism) Serio */
         .glass-card {
-            background: rgba(255, 255, 255, 0.4); /* Transparencia equilibrada */
+            background: rgba(255, 255, 255, 0.4);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -43,10 +43,9 @@
         }
 
         /* 5. Utilidades y Tabs */
-        .active-tab { border-bottom: 3px solid #6b21a8; font-weight: bold; color: #6b21a8; } /* Morado serio */
+        .active-tab { border-bottom: 3px solid #6b21a8; font-weight: bold; color: #6b21a8; }
         .hidden { display: none; }
         
-        /* Scrollbar minimalista para áreas de glassmorphism */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: rgba(255,255,255,0.1); }
         ::-webkit-scrollbar-thumb { background: rgba(107, 33, 168, 0.3); border-radius: 3px; }
@@ -57,8 +56,8 @@
 
     <div id="login-screen" class="flex flex-col items-center justify-center min-h-screen p-4">
         <div class="glass-card p-5 mb-20 rounded-3xl flex items-center justify-center border border-white/30 shadow-2xl">
-    <img src="https://nitro-tienda.com/web/image/website/1/logo/Nitro?unique=6d3069e" alt="Logo Nitro" class="h-14">
-</div>
+            <img src="https://nitro-tienda.com/web/image/website/1/logo/Nitro?unique=6d3069e" alt="Logo Nitro" class="h-14">
+        </div>
         
         <div class="glass-card p-10 w-full max-w-md border border-white/20 transition-all-suave hover-elevate">
             <h1 class="text-2xl font-black text-center text-slate-800 mb-8 tracking-tighter uppercase">Gestión de Comedor</h1>
@@ -136,26 +135,28 @@
                         REFRESCAR ↻
                     </button>
                 </header>
+                
                 <div id="ultima-comida-card" class="hidden mb-10 glass-card p-6 border-white/40 border-2">
-    <div class="flex items-center gap-3 mb-4">
-        <span class="text-2xl">🍽️</span>
-        <h3 class="font-black text-slate-800 uppercase tracking-tighter">Última Comida Realizada</h3>
-    </div>
-    <div id="lista-menu-anterior" class="flex flex-wrap gap-4 text-xs font-bold">
-        </div>
-</div>
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="text-2xl">🍽️</span>
+                        <h3 class="font-black text-slate-800 uppercase tracking-tighter">Última Comida Realizada</h3>
+                    </div>
+                    <div id="lista-menu-anterior" class="flex flex-wrap gap-4 text-xs font-bold"></div>
+                </div>
+
                 <div id="resultados-grid" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-12"></div>
                 
                 <div class="mt-12 glass-card p-8 pb-16 transition-all-suave hover-elevate">
                     <h3 class="font-bold text-slate-500 uppercase text-[10px] mb-6 tracking-widest">Acumulado Histórico</h3>
                     <div class="h-auto">
-                     <canvas id="statsChart"></canvas>
+                        <canvas id="statsChart"></canvas>
                     </div>
                 </div>
             </section>
 
             <section id="admin" class="section-content hidden">
                 <h2 class="text-3xl font-bold mb-8 italic text-purple-800 tracking-tight">Panel de Control RRHH</h2>
+                
                 <div class="mb-10">
                     <h3 class="font-bold text-slate-500 text-xs uppercase mb-4 tracking-widest">Gestión de Personal</h3>
                     <div class="glass-card rounded-2xl overflow-hidden transition-all-suave hover-elevate">
@@ -168,38 +169,35 @@
                             </table>
                         </div>
                         <div class="p-5 bg-white/20 border-t border-white/20 flex flex-wrap gap-3">
-                            <input type="text" id="nu" placeholder="Usuario" class="p-3 bg-white/60 border border-white/30 rounded-xl text-sm flex-1 focus:ring-2 focus:ring-purple-400 outline-none">
-                            <input type="text" id="nc" placeholder="Clave" class="p-3 bg-white/60 border border-white/30 rounded-xl text-sm flex-1 focus:ring-2 focus:ring-purple-400 outline-none">
-                            <input type="text" id="nn" placeholder="Nombre" class="p-3 bg-white/60 border border-white/30 rounded-xl text-sm flex-1 focus:ring-2 focus:ring-purple-400 outline-none">
-                            <select id="nr" class="p-3 bg-white/60 border border-white/30 rounded-xl text-sm focus:ring-2 focus:ring-purple-400 outline-none"><option value="USER">USER</option><option value="ADMIN">ADMIN</option></select>
-                            <button onclick="addUser()" class="bg-purple-800 text-white px-6 py-3 rounded-xl font-bold text-sm w-full md:w-auto hover:bg-purple-900 transition-all-suave">Añadir Colaborador</button>
+                            <input type="text" id="nu" placeholder="Usuario" class="p-3 bg-white/60 border border-white/30 rounded-xl text-sm flex-1 outline-none">
+                            <input type="text" id="nc" placeholder="Clave" class="p-3 bg-white/60 border border-white/30 rounded-xl text-sm flex-1 outline-none">
+                            <input type="text" id="nn" placeholder="Nombre" class="p-3 bg-white/60 border border-white/30 rounded-xl text-sm flex-1 outline-none">
+                            <select id="nr" class="p-3 bg-white/60 border border-white/30 rounded-xl text-sm outline-none"><option value="USER">USER</option><option value="ADMIN">ADMIN</option></select>
+                            <button onclick="addUser()" class="bg-purple-800 text-white px-6 py-3 rounded-xl font-bold text-sm w-full md:w-auto hover:bg-purple-900 transition-all-suave">Añadir</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-12">
+                    <h3 class="font-bold text-slate-500 text-xs uppercase mb-4 tracking-widest">Gestión del Menú (Opciones)</h3>
+                    <div class="glass-card rounded-2xl p-6 transition-all-suave hover-elevate">
+                        <div id="admin-menu-container" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8"></div>
+                        <div class="p-5 bg-white/20 border-t border-white/20 rounded-xl flex flex-wrap gap-3 items-end">
+                            <div class="flex-1 min-w-[150px]">
+                                <label class="text-[9px] font-bold text-slate-500 uppercase ml-2">Categoría</label>
+                                <select id="new-opt-cat" class="w-full p-3 bg-white/60 border border-white/30 rounded-xl text-sm focus:ring-2 focus:ring-purple-400 outline-none"></select>
+                            </div>
+                            <div class="flex-[2] min-w-[200px]">
+                                <label class="text-[9px] font-bold text-slate-500 uppercase ml-2">Nuevo Plato</label>
+                                <input type="text" id="new-opt-nombre" placeholder="Ej: Lomo Saltado" class="w-full p-3 bg-white/60 border border-white/30 rounded-xl text-sm outline-none">
+                            </div>
+                            <button onclick="addOption()" class="bg-purple-800 text-white px-8 py-3 rounded-xl font-bold text-sm hover:bg-purple-900 transition-all-suave h-[46px]">Añadir Plato</button>
                         </div>
                     </div>
                 </div>
             </section>
         </main>
     </div>
-<div class="mt-12">
-    <h3 class="font-bold text-slate-500 text-xs uppercase mb-4 tracking-widest">Gestión del Menú (Opciones)</h3>
-    <div class="glass-card rounded-2xl p-6 transition-all-suave hover-elevate">
-        <div id="admin-menu-container" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
-            </div>
-        
-        <div class="p-5 bg-white/20 border-t border-white/20 rounded-xl flex flex-wrap gap-3 items-end">
-            <div class="flex-1 min-w-[150px]">
-                <label class="text-[9px] font-bold text-slate-500 uppercase ml-2">Categoría</label>
-                <select id="new-opt-cat" class="w-full p-3 bg-white/60 border border-white/30 rounded-xl text-sm focus:ring-2 focus:ring-purple-400 outline-none"></select>
-            </div>
-            <div class="flex-[2] min-w-[200px]">
-                <label class="text-[9px] font-bold text-slate-500 uppercase ml-2">Nombre del Nuevo Plato</label>
-                <input type="text" id="new-opt-nombre" placeholder="Ej: Lomo Saltado" class="w-full p-3 bg-white/60 border border-white/30 rounded-xl text-sm focus:ring-2 focus:ring-purple-400 outline-none">
-            </div>
-            <button onclick="addOption()" class="bg-purple-800 text-white px-8 py-3 rounded-xl font-bold text-sm hover:bg-purple-900 transition-all-suave h-[46px]">
-                Añadir Plato
-            </button>
-        </div>
-    </div>
-</div>
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycby_MDZMaCd1JP20Hep8K1aiKzDshGomr_kDsoNZHVguqzhjCHrPu9uTxryIjDTyz4k/exec"; 
@@ -235,33 +233,29 @@
         }
 
         async function fetchData() {
-    try {
-        const res = await fetch(API_URL + "?action=get_opciones");
-        const json = await res.json();
-        renderMenu(json.data);
-        
-        if (currentUser.rol === 'ADMIN') {
-            renderMenuAdmin(json.data); // <-- Añade esta línea
-            const userRes = await fetch(API_URL + "?action=get_usuarios");
-            const userData = await userRes.json();
-            renderUsers(userData.users);
-        }
+            try {
+                const res = await fetch(API_URL + "?action=get_opciones");
+                const json = await res.json();
+                renderMenu(json.data);
+                
+                if (currentUser && currentUser.rol === 'ADMIN') {
+                    renderMenuAdmin(json.data); 
+                    const userRes = await fetch(API_URL + "?action=get_usuarios");
+                    const userData = await userRes.json();
+                    renderUsers(userData.users);
+                }
             } catch (e) {
-        console.error("Error detallado:", e); // Esto te dirá qué falló exactamente en la consola
-        grid.innerHTML = '<p class="col-span-full text-center text-red-400 py-10 glass-card rounded-2xl">Error de sincronización con el servidor.</p>';
-    }
+                console.error("Error detallado:", e);
+                alert("Error de sincronización con el servidor.");
+            }
         }
 
         function renderMenu(menu) {
             const form = document.getElementById('voteForm');
             const propCat = document.getElementById('prop-cat');
-            
-            // Limpiamos solo si los elementos existen en el momento
             if (form) form.innerHTML = ''; 
             if (propCat) propCat.innerHTML = '';
-            
             for (const cat in menu) {
-                // Si el formulario de votos existe (estamos en horario), lo llenamos
                 if (form) {
                     const div = document.createElement('div');
                     div.className = "glass-card p-6 border border-white/30 transition-all-suave hover-elevate";
@@ -271,18 +265,14 @@
                         ${menu[cat].map(o => `<option value="${o}">${o}</option>`).join('')}</select>`;
                     form.appendChild(div);
                 }
-                
-                // Las categorías de PROPUESTAS se llenan SIEMPRE
-                if (propCat) {
-                    propCat.innerHTML += `<option value="${cat}">${cat}</option>`;
-                }
+                if (propCat) propCat.innerHTML += `<option value="${cat}">${cat}</option>`;
             }
         }
 
         async function enviarVotos() {
             const formData = new FormData(document.getElementById('voteForm'));
             const selecciones = Object.fromEntries(formData);
-            if (Object.values(selecciones).some(v => v === "")) return alert("⚠️ Selecciona una opción por categoría.");
+            if (Object.values(selecciones).some(v => v === "")) return alert("⚠️ Selecciona una opción.");
             const res = await fetch(API_URL, {
                 method: 'POST',
                 body: JSON.stringify({ action: 'votar', usuario: currentUser.usuario, selecciones })
@@ -293,7 +283,7 @@
 
         async function cargarPropuestasParaVotar() {
             const container = document.getElementById('lista-propuestas');
-            container.innerHTML = '<p class="text-center text-slate-500 py-10 text-sm animate-pulse glass-card rounded-2xl">Actualizando lista...</p>';
+            container.innerHTML = '<p class="text-center text-slate-500 py-10 animate-pulse">Cargando...</p>';
             try {
                 const res = await fetch(API_URL + "?action=get_propuestas");
                 const json = await res.json();
@@ -304,19 +294,19 @@
                         div.className = "glass-card p-4 flex justify-between items-center transition-all-suave hover-scale";
                         div.innerHTML = `
                             <div class="flex-1">
-                                <p class="text-[9px] font-bold text-purple-800 uppercase tracking-wider">${p.categoria}</p>
+                                <p class="text-[9px] font-bold text-purple-800 uppercase">${p.categoria}</p>
                                 <p class="font-bold text-slate-800 text-sm">${p.nombre}</p>
-                                <p class="text-[9px] text-slate-500 mt-1">Por: ${p.autor} | ${p.votos} Apoyos</p>
+                                <p class="text-[9px] text-slate-500">Por: ${p.autor} | ${p.votos} Apoyos</p>
                             </div>
-                            <button onclick="apoyarPropuesta(${p.id})" class="bg-purple-100 text-purple-900 px-4 py-2 rounded-lg text-[10px] font-black hover:bg-purple-800 hover:text-white transition uppercase tracking-widest">Apoyar</button>`;
+                            <button onclick="apoyarPropuesta(${p.id})" class="bg-purple-100 text-purple-900 px-4 py-2 rounded-lg text-[10px] font-black hover:bg-purple-800 hover:text-white transition">Apoyar</button>`;
                         container.appendChild(div);
                     });
-                } else { container.innerHTML = '<p class="text-center text-slate-500 py-10 text-sm italic glass-card rounded-2xl">Sin propuestas esta semana.</p>'; }
-            } catch (e) { container.innerHTML = '<p class="text-center text-red-400 py-10 text-xs font-bold glass-card rounded-2xl">Error de sincronización.</p>'; }
+                } else { container.innerHTML = '<p class="text-center text-slate-500 py-10">Sin propuestas.</p>'; }
+            } catch (e) { container.innerHTML = '<p class="text-center text-red-400 py-10">Error.</p>'; }
         }
 
         async function apoyarPropuesta(filaId) {
-            if(!confirm("¿Deseas usar uno de tus 2 apoyos semanales?")) return;
+            if(!confirm("¿Deseas apoyar esta propuesta?")) return;
             const res = await fetch(API_URL, {
                 method: 'POST',
                 body: JSON.stringify({ action: 'votar_propuesta', usuario: currentUser.usuario, filaPropuesta: filaId })
@@ -344,13 +334,13 @@
             tbody.innerHTML = users.map(u => `
                 <tr class="border-b border-white/10 hover:bg-white/10 transition">
                     <td class="p-5 font-bold text-slate-800">${u[0]}</td><td class="p-5 text-slate-700">${u[2]}</td><td class="p-5"><span class="px-2 py-1 rounded text-[10px] font-bold ${u[3] === 'ADMIN' ? 'bg-purple-200 text-purple-900' : 'bg-slate-100 text-slate-600'}">${u[3]}</span></td>
-                    <td class="p-5 text-center"><button onclick="deleteUser('${u[0]}')" class="text-red-500 hover:text-red-700 font-bold text-xs uppercase tracking-widest">Eliminar</button></td>
+                    <td class="p-5 text-center"><button onclick="deleteUser('${u[0]}')" class="text-red-500 hover:text-red-700 font-bold text-xs uppercase">Eliminar</button></td>
                 </tr>`).join('');
         }
 
         async function addUser() {
             const u = document.getElementById('nu').value, c = document.getElementById('nc').value, n = document.getElementById('nn').value, r = document.getElementById('nr').value;
-            if(!u || !c || !n) return alert("Completa los datos del nuevo colaborador.");
+            if(!u || !c || !n) return alert("Completa los datos.");
             await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'crud_usuarios', subAction: 'agregar', u, c, n, r }) });
             fetchData();
         }
@@ -368,189 +358,103 @@
             const tab = document.getElementById('tab-' + id);
             if(tab) tab.classList.add('active-tab');
 
-            const ahora = new Date();
-            const hora = ahora.getHours();
-            const min = ahora.getMinutes();
-            const tiempoDecimal = hora + (min / 60);
-            
-            // LÓGICA DE HORARIO: 13:00 (13.0) a 16:40 (16.66) - No cambiada
+            const ahora = new Date(), hora = ahora.getHours(), min = ahora.getMinutes(), tiempoDecimal = hora + (min / 60);
             const estaEnHorario = (tiempoDecimal >= 13) && (tiempoDecimal <= 16.66);
 
             if (id === 'votar' && !estaEnHorario && currentUser.rol !== 'ADMIN') {
-    const container = document.getElementById('voto-dinamico-container');
-    if (container) {
-        container.innerHTML = `
-            <div class="col-span-full glass-card p-10 text-center border-white/20">
-                <p class="text-5xl mb-4">🙄</p>
-                <h3 class="text-2xl font-black text-slate-800 mb-2 uppercase tracking-tight">¡AH! ¿AHORA SI QUIERES VOTAR?</h3>
-                <p class="text-slate-600 font-medium italic text-sm">Espera el horario establecido, colega.</p>
-                <div class="mt-6 inline-block bg-purple-800 px-4 py-2 rounded-full text-xs font-bold text-white uppercase tracking-widest shadow-md">
-                    Horario: 13:00 PM - 16:40 PM
-                </div>
-            </div>
-        `;
-    }
-    return; // Detenemos la ejecución solo para la pestaña Votar
-}
-
-            if(id === 'resultado') {
-                const canvasElement = document.getElementById('statsChart');
-                if(canvasElement) canvasElement.parentElement.classList.remove('hidden');
-                renderStats();
+                const container = document.getElementById('voto-dinamico-container');
+                if (container) {
+                    container.innerHTML = `<div class="col-span-full glass-card p-10 text-center border-white/20"><p class="text-5xl mb-4">🙄</p><h3 class="text-2xl font-black text-slate-800 mb-2 uppercase">¡AH! ¿AHORA SI QUIERES VOTAR?</h3><p class="text-slate-600 font-medium italic text-sm">Espera el horario establecido.</p><div class="mt-6 inline-block bg-purple-800 px-4 py-2 rounded-full text-xs font-bold text-white uppercase shadow-md">Horario: 13:00 PM - 16:40 PM</div></div>`;
+                }
+                return;
             }
+
+            if(id === 'resultado') renderStats();
             if(id === 'proponer') cargarPropuestasParaVotar();
         }
 
         async function renderStats() {
-    const grid = document.getElementById('resultados-grid');
-    const ultimaComidaCont = document.getElementById('ultima-comida-card');
-    
-    grid.innerHTML = '<p class="col-span-full text-center text-purple-900 py-10 animate-bounce font-bold glass-card rounded-2xl border-white/30">Calculando podios...</p>';
+            const grid = document.getElementById('resultados-grid');
+            const ultimaComidaCont = document.getElementById('ultima-comida-card');
+            grid.innerHTML = '<p class="col-span-full text-center text-purple-900 py-10 animate-bounce font-bold">Calculando podios...</p>';
 
-    try {
-        // --- NUEVA PARTE: Cargar Última Comida Realizada ---
-        const resAnterior = await fetch(API_URL + "?action=get_ultima_comida");
-        const jsonAnterior = await resAnterior.json();
-        
-        if (jsonAnterior.success && Object.keys(jsonAnterior.menuAnterior).length > 0) {
-            ultimaComidaCont.classList.remove('hidden');
-            ultimaComidaCont.innerHTML = `
-                <div class="glass-card p-6 border-white/40 border-2 transition-all-suave hover-elevate">
-                    <div class="flex items-center gap-3 mb-4">
-                        <span class="text-2xl">🍽️</span>
-                        <h3 class="font-black text-slate-800 uppercase tracking-tighter">Última Comida Realizada</h3>
-                    </div>
-                    <div class="flex flex-wrap gap-3">
-                        ${Object.entries(jsonAnterior.menuAnterior).map(([cat, plato]) => `
-                            <div class="bg-white/40 px-3 py-2 rounded-lg border border-white/20">
-                                <span class="text-purple-900 block text-[9px] font-black uppercase">${cat}</span>
-                                <span class="text-slate-800 text-sm font-bold">${plato}</span>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-            `;
-        }
+            try {
+                const resAnterior = await fetch(API_URL + "?action=get_ultima_comida");
+                const jsonAnterior = await resAnterior.json();
+                if (jsonAnterior.success && Object.keys(jsonAnterior.menuAnterior).length > 0) {
+                    ultimaComidaCont.classList.remove('hidden');
+                    document.getElementById('lista-menu-anterior').innerHTML = Object.entries(jsonAnterior.menuAnterior).map(([cat, plato]) => `
+                        <div class="bg-white/40 px-3 py-2 rounded-lg border border-white/20">
+                            <span class="text-purple-900 block text-[9px] font-black uppercase">${cat}</span>
+                            <span class="text-slate-800 text-sm font-bold">${plato}</span>
+                        </div>`).join('');
+                }
 
-        // --- TU CÓDIGO ORIGINAL: Resultados del Día ---
-        const res = await fetch(API_URL + "?action=get_resultados_dia");
-        const json = await res.json();
+                const res = await fetch(API_URL + "?action=get_resultados_dia");
+                const json = await res.json();
+                if (json.success && Object.keys(json.resultados).length > 0) {
+                    grid.innerHTML = '';
+                    for (const categoria in json.resultados) {
+                        const card = document.createElement('div');
+                        card.className = "glass-card p-6 flex flex-col h-full border border-white/30 transition-all-suave hover-elevate";
+                        card.innerHTML = `<div class="mb-4"><span class="bg-purple-100 text-purple-900 text-[10px] font-black px-3 py-1 rounded-full uppercase">${categoria}</span></div>
+                            <div class="space-y-4 flex-grow">${json.resultados[categoria].map((p, index) => `
+                                <div class="flex justify-between items-center p-3 rounded-xl transition ${index === 0 ? 'bg-purple-800/80 text-white shadow-lg' : 'bg-white/40 text-slate-800'}">
+                                    <div class="flex items-center gap-3"><span class="text-xl">${index === 0 ? '🥇' : '🥈'}</span><span class="text-sm font-bold">${p.nombre}</span></div>
+                                    <span class="text-[10px] font-black px-2 py-1 rounded-md shadow-inner ${index === 0 ? 'bg-white/20 text-white' : 'bg-white/80 text-purple-900'}">${p.votos} VOTOS</span>
+                                </div>`).join('')}</div>`;
+                        grid.appendChild(card);
+                    }
+                } else { grid.innerHTML = '<p class="col-span-full text-center text-slate-500 py-10">Sin votos registrados.</p>'; }
 
-        if (json.success && Object.keys(json.resultados).length > 0) {
-            grid.innerHTML = '';
-            for (const categoria in json.resultados) {
-                const card = document.createElement('div');
-                card.className = "glass-card p-6 flex flex-col h-full border border-white/30 transition-all-suave hover-elevate";
-                card.innerHTML = `
-                    <div class="mb-4">
-                        <span class="bg-purple-100 text-purple-900 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">${categoria}</span>
-                    </div>
-                    <div class="space-y-4 flex-grow">
-                        ${json.resultados[categoria].map((p, index) => `
-                            <div class="flex justify-between items-center p-3 rounded-xl transition ${index === 0 ? 'bg-purple-800/80 text-white shadow-lg' : 'bg-white/40 text-slate-800'}">
-                                <div class="flex items-center gap-3">
-                                    <span class="text-xl">${index === 0 ? '🥇' : '🥈'}</span>
-                                    <span class="text-sm font-bold">${p.nombre}</span>
-                                </div>
-                                <span class="text-[10px] font-black px-2 py-1 rounded-md shadow-inner ${index === 0 ? 'bg-white/20 text-white' : 'bg-white/80 text-purple-900'}">
-                                    ${p.votos} VOTOS
-                                </span>
-                            </div>`).join('')}
-                    </div>`;
-                grid.appendChild(card);
-            }
-        } else {
-            grid.innerHTML = '<p class="col-span-full text-center text-slate-500 py-10 glass-card rounded-2xl">No hay votos registrados.</p>';
-        }
+            } catch (e) { grid.innerHTML = '<p class="col-span-full text-center text-red-400 py-10">Error de conexión.</p>'; }
 
-    } catch (e) {
-        grid.innerHTML = '<p class="col-span-full text-center text-red-400 py-10 glass-card rounded-2xl">Error de conexión.</p>';
-    }
-
-    // --- PROCESAMIENTO DE HISTÓRICO CATEGORIZADO (TOP 5) ---
-    const histRes = await fetch(API_URL + "?action=get_stats");
-    const histData = await histRes.json();
-    
-    // Ubicamos el contenedor del gráfico para transformarlo en un Panel de Rankings
-    const statsContainer = document.getElementById('statsChart').parentElement;
-    statsContainer.innerHTML = `
-        <h3 class="font-bold text-slate-500 uppercase text-[10px] mb-6 tracking-widest text-center">Top 5 Histórico (Últimos 2 meses)</h3>
-        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            ${Object.entries(histData.stats).map(([cat, platos]) => `
-                <div class="bg-white/20 p-4 rounded-2xl border border-white/10 transition-all-suave hover-elevate">
-                    <p class="text-[9px] font-black text-purple-900 uppercase mb-3 border-b border-purple-900/10 pb-1">${cat}</p>
-                    <div class="space-y-2">
-                        ${platos.map((p, i) => `
+            const histRes = await fetch(API_URL + "?action=get_stats");
+            const histData = await histRes.json();
+            const statsContainer = document.getElementById('statsChart').parentElement;
+            statsContainer.innerHTML = `<h3 class="font-bold text-slate-500 uppercase text-[10px] mb-6 tracking-widest text-center">Top 5 Histórico</h3>
+                <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">${Object.entries(histData.stats).map(([cat, platos]) => `
+                    <div class="bg-white/20 p-4 rounded-2xl border border-white/10 transition-all-suave hover-elevate">
+                        <p class="text-[9px] font-black text-purple-900 uppercase mb-3 border-b border-purple-900/10 pb-1">${cat}</p>
+                        <div class="space-y-2">${platos.map((p, i) => `
                             <div class="flex justify-between items-center text-xs">
-                                <span class="text-slate-700 truncate mr-2">
-                                    <span class="font-bold text-purple-800">${i + 1}.</span> ${p.nombre}
-                                </span>
+                                <span class="text-slate-700 truncate mr-2"><span class="font-bold text-purple-800">${i + 1}.</span> ${p.nombre}</span>
                                 <span class="bg-purple-900/10 px-2 py-0.5 rounded text-purple-900 font-bold">${p.votos}</span>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-            `).join('')}
-        </div>
-    `;
-}
+                            </div>`).join('')}</div></div>`).join('')}</div>`;
+        }
 
-function renderMenuAdmin(menu) {
-    const container = document.getElementById('admin-menu-container');
-    const selectAdd = document.getElementById('new-opt-cat');
-    container.innerHTML = '';
-    selectAdd.innerHTML = '';
+        function renderMenuAdmin(menu) {
+            const container = document.getElementById('admin-menu-container');
+            const selectAdd = document.getElementById('new-opt-cat');
+            container.innerHTML = ''; selectAdd.innerHTML = '';
+            for (const cat in menu) {
+                selectAdd.innerHTML += `<option value="${cat}">${cat}</option>`;
+                const card = document.createElement('div');
+                card.className = "bg-white/30 p-4 rounded-xl border border-white/20";
+                card.innerHTML = `<p class="text-[10px] font-black text-purple-900 uppercase mb-3 border-b border-purple-900/10 pb-1">${cat}</p>
+                    <div class="space-y-2">${menu[cat].map(plato => `
+                        <div class="flex justify-between items-center text-xs bg-white/40 p-2 rounded-lg group">
+                            <span class="text-slate-700 font-medium">${plato}</span>
+                            <button onclick="deleteOption('${cat}', '${plato}')" class="text-red-400 hover:text-red-600 font-bold opacity-0 group-hover:opacity-100 transition-opacity">✕</button>
+                        </div>`).join('')}</div>`;
+                container.appendChild(card);
+            }
+        }
 
-    for (const cat in menu) {
-        // Llenar el selector de "Añadir"
-        selectAdd.innerHTML += `<option value="${cat}">${cat}</option>`;
+        async function addOption() {
+            const categoria = document.getElementById('new-opt-cat').value, nombre = document.getElementById('new-opt-nombre').value;
+            if(!nombre) return alert("Escribe el nombre del plato.");
+            const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'crud_admin', subAction: 'agregar', categoria, nombre }) });
+            const data = await res.json();
+            if(data.success) { document.getElementById('new-opt-nombre').value = ''; fetchData(); }
+        }
 
-        // Crear tarjeta de categoría para gestión
-        const card = document.createElement('div');
-        card.className = "bg-white/30 p-4 rounded-xl border border-white/20";
-        card.innerHTML = `
-            <p class="text-[10px] font-black text-purple-900 uppercase mb-3 border-b border-purple-900/10 pb-1">${cat}</p>
-            <div class="space-y-2">
-                ${menu[cat].map(plato => `
-                    <div class="flex justify-between items-center text-xs bg-white/40 p-2 rounded-lg group">
-                        <span class="text-slate-700 font-medium">${plato}</span>
-                        <button onclick="deleteOption('${cat}', '${plato}')" class="text-red-400 hover:text-red-600 font-bold opacity-0 group-hover:opacity-100 transition-opacity">
-                            ✕
-                        </button>
-                    </div>
-                `).join('')}
-            </div>
-        `;
-        container.appendChild(card);
-    }
-}
-
-async function addOption() {
-    const categoria = document.getElementById('new-opt-cat').value;
-    const nombre = document.getElementById('new-opt-nombre').value;
-    if(!nombre) return alert("Escribe el nombre del plato.");
-
-    const res = await fetch(API_URL, {
-        method: 'POST',
-        body: JSON.stringify({ action: 'crud_admin', subAction: 'agregar', categoria, nombre })
-    });
-    const data = await res.json();
-    if(data.success) {
-        document.getElementById('new-opt-nombre').value = '';
-        fetchData(); // Recargamos todo
-    }
-}
-
-async function deleteOption(categoria, nombre) {
-    if(!confirm(`¿Eliminar "${nombre}" de la categoría ${categoria}?`)) return;
-
-    const res = await fetch(API_URL, {
-        method: 'POST',
-        body: JSON.stringify({ action: 'crud_admin', subAction: 'eliminar', categoria, nombre })
-    });
-    const data = await res.json();
-    if(data.success) fetchData();
-}
+        async function deleteOption(categoria, nombre) {
+            if(!confirm(`¿Eliminar "${nombre}"?`)) return;
+            const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'crud_admin', subAction: 'eliminar', categoria, nombre }) });
+            const data = await res.json();
+            if(data.success) fetchData();
+        }
 
         function logout() { localStorage.removeItem('buffet_session'); location.reload(); }
     </script>
