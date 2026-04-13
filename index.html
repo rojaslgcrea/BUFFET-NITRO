@@ -3,129 +3,166 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buffet Nitro - Sistema de Gestión v4.4</title>
+    <title>Buffet Nitro - Sistema de Gestión</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        html { scroll-behavior: smooth; }
-        .active-tab { border-bottom: 4px solid #ffffff; font-weight: bold; color: #fdfdfd; }
+        /* ESTILOS CSS PERSONALIZADOS (Prontis Aesthetic) */
+        
+        /* 1. Fondo Machu Picchu Natural (Sin filtros de color) */
+        body {
+            background-image: url('https://media.istockphoto.com/id/515885778/photo/machu-picchu.webp?s=1024x1024&w=is&k=20&c=ZVwsmDgTVzbwwRWp6RMYzMnDVoWewNGFygg6_F60mwI=');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+        }
+
+        /* 2. Efecto Cristal (Glassmorphism) Serio */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.4); /* Transparencia equilibrada */
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+        }
+
+        /* 3. Animaciones Suaves Globales */
+        .transition-all-suave {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* 4. Efectos Hover Microinteracciones */
+        .hover-elevate:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .hover-scale:hover {
+            transform: scale(1.02);
+        }
+
+        /* 5. Utilidades y Tabs */
+        .active-tab { border-bottom: 3px solid #6b21a8; font-weight: bold; color: #6b21a8; } /* Morado serio */
         .hidden { display: none; }
-        /* Animación suave para todas las cards */
-        .glass-card { 
-            transition: transform 0.3s ease, box-shadow 0.3s ease; 
-        }
-        .glass-card:hover { 
-            transform: translateY(-5px) scale(1.02); 
-            box-shadow: 0 20px 25px -5px rgba(109, 40, 217, 0.2), 0 10px 10px -5px rgba(109, 40, 217, 0.1);
-        }
+        
+        /* Scrollbar minimalista para áreas de glassmorphism */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.1); }
+        ::-webkit-scrollbar-thumb { background: rgba(107, 33, 168, 0.3); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(107, 33, 168, 0.5); }
     </style>
 </head>
-<body class="bg-[url('https://media.istockphoto.com/id/515885778/photo/machu-picchu.webp?s=1024x1024&w=is&k=20&c=ZVwsmDgTVzbwwRWp6RMYzMnDVoWewNGFygg6_F60mwI=')] bg-cover bg-fixed font-sans text-slate-800">
-    <div class="fixed inset-0 bg-purple-900/40 z-[-1]"></div>
+<body class="min-h-screen font-sans text-slate-900">
 
     <div id="login-screen" class="flex flex-col items-center justify-center min-h-screen p-4">
-        <img src="https://nitro-tienda.com/web/image/website/1/logo/Nitro?unique=6d3069e" alt="Logo Nitro" class="w-24 mb-6 animate-pulse">
-        <div class="backdrop-blur-sm bg-white/70 p-8 rounded-3xl shadow-xl w-full max-w-md border border-white/20">
-            <h1 class="text-3xl font-black text-center text-purple-700 mb-6 tracking-tighter">BUFFET NITRO 🚀</h1>
-            <div class="space-y-4">
-                <input type="text" id="user-input" placeholder="Usuario" class="w-full p-4 bg-white/80 border-none rounded-xl outline-none focus:ring-2 focus:ring-purple-500">
-                <input type="password" id="pass-input" placeholder="Contraseña" class="w-full p-4 bg-white/80 border-none rounded-xl outline-none focus:ring-2 focus:ring-purple-500">
-                <button onclick="handleLogin()" class="w-full bg-purple-600 text-white font-bold py-4 rounded-xl shadow-lg shadow-purple-100 hover:bg-purple-700 transition">INGRESAR</button>
+        <img src="https://nitro-tienda.com/web/image/website/1/logo/Nitro?unique=6d3069e" alt="Logo Nitro" class="h-16 mb-8 drop-shadow-lg">
+        
+        <div class="glass-card p-10 w-full max-w-md border border-white/20 transition-all-suave hover-elevate">
+            <h1 class="text-2xl font-black text-center text-slate-800 mb-8 tracking-tighter uppercase">Gestión de Comedor</h1>
+            <div class="space-y-5">
+                <input type="text" id="user-input" placeholder="Usuario" class="w-full p-4 bg-white/60 border border-white/30 rounded-xl outline-none focus:ring-2 focus:ring-purple-400 transition-all-suave">
+                <input type="password" id="pass-input" placeholder="Contraseña" class="w-full p-4 bg-white/60 border border-white/30 rounded-xl outline-none focus:ring-2 focus:ring-purple-400 transition-all-suave">
+                <button onclick="handleLogin()" class="w-full bg-purple-800 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-purple-900 transition-all-suave transform hover:scale-[1.03]">INGRESAR</button>
             </div>
         </div>
     </div>
 
     <div id="app-container" class="hidden">
-        <nav class="bg-purple-800 text-white shadow-lg sticky top-0 z-50">
+        <nav class="bg-purple-950/80 backdrop-blur-lg text-white shadow-xl sticky top-0 z-50 border-b border-purple-900">
             <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-                <div class="flex items-center space-x-3">
-                    <img src="https://nitro-tienda.com/web/image/website/1/logo/Nitro?unique=6d3069e" alt="Logo Nitro Small" class="w-10">
-                    <span class="font-bold text-xs md:text-sm italic" id="welcome-msg"></span>
+                <div class="flex items-center gap-4">
+                    <img src="https://nitro-tienda.com/web/image/website/1/logo/Nitro?unique=6d3069e" alt="Logo Nitro" class="h-9">
+                    <span class="font-medium text-xs text-purple-100 italic" id="welcome-msg"></span>
                 </div>
-                <div class="flex space-x-2 md:space-x-4 text-[10px] md:text-xs font-bold uppercase">
-                    <button onclick="showSection('votar')" id="tab-votar" class="nav-link py-1 hover:text-purple-100 transition">Votar</button>
-                    <button onclick="showSection('proponer')" id="tab-proponer" class="nav-link py-1 hover:text-purple-100 transition">Propuestas</button>
-                    <button onclick="showSection('resultado')" id="tab-resultado" class="nav-link py-1 hover:text-purple-100 transition">Resultados</button>
-                    <button id="admin-nav" onclick="showSection('admin')" class="nav-link py-1 hidden hover:text-purple-100 transition">Admin</button>
-                    <button onclick="logout()" class="text-purple-200 border-l border-purple-500 pl-2">Salir</button>
+                <div class="flex space-x-1 md:space-x-3 text-[10px] md:text-xs font-bold uppercase tracking-wider">
+                    <button onclick="showSection('votar')" id="tab-votar" class="nav-link py-2 px-3 rounded-lg hover:bg-white/5 transition-all-suave">Votar</button>
+                    <button onclick="showSection('proponer')" id="tab-proponer" class="nav-link py-2 px-3 rounded-lg hover:bg-white/5 transition-all-suave">Propuestas</button>
+                    <button onclick="showSection('resultado')" id="tab-resultado" class="nav-link py-2 px-3 rounded-lg hover:bg-white/5 transition-all-suave">Resultados</button>
+                    <button id="admin-nav" onclick="showSection('admin')" class="nav-link py-2 px-3 rounded-lg hidden hover:bg-white/5 transition-all-suave">Admin</button>
+                    <button onclick="logout()" class="text-purple-300 border-l border-purple-800 pl-3 hover:text-white transition-all-suave">Salir</button>
                 </div>
             </div>
         </nav>
 
-        <main class="max-w-6xl mx-auto p-4 md:p-8">
+        <main class="max-w-7xl mx-auto p-4 md:p-10">
             
             <section id="votar" class="section-content">
-                <header class="mb-6">
-                    <h2 class="text-3xl font-black text-white">Menú de Mañana</h2>
+                <header class="mb-10">
+                    <h2 class="text-4xl font-black text-slate-800 tracking-tighter">Menú de Mañana</h2>
+                    <p class="text-slate-600 text-sm mt-1">Selecciona tus preferencias para el mini-bufet.</p>
                 </header>
-                <div id="voto-dinamico-container">
-                    <form id="voteForm" class="grid gap-4 md:grid-cols-2"></form>
-                    <button id="btn-votar" onclick="enviarVotos()" class="mt-8 w-full bg-purple-600 text-white font-bold py-5 rounded-2xl shadow-xl shadow-purple-100 hover:bg-purple-700 transition">
-                        ENVIAR MI ELECCIÓN
+                <div id="voto-dinamico-container" class="space-y-10">
+                    <form id="voteForm" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3"></form>
+                    <button id="btn-votar" onclick="enviarVotos()" class="w-full max-w-xl mx-auto block bg-purple-800 text-white font-bold py-5 rounded-2xl shadow-xl hover:bg-purple-900 transition-all-suave transform hover:scale-[1.02] flex items-center justify-center gap-3">
+                        <span class="text-xl">🚀</span> ENVIAR MI ELECCIÓN
                     </button>
                 </div>
             </section>
 
             <section id="proponer" class="section-content hidden">
-                <div class="grid gap-8 md:grid-cols-2">
+                <div class="grid gap-10 md:grid-cols-2">
                     <div>
-                        <h2 class="text-2xl font-bold mb-4 text-white">Nueva Propuesta</h2>
-                        <div class="backdrop-blur-sm bg-white/80 p-6 rounded-2xl shadow-sm border border-white/20 space-y-4">
-                            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Categoría</label>
-                            <select id="prop-cat" class="w-full p-3 bg-white border-none rounded-xl focus:ring-2 focus:ring-purple-500"></select>
-                            <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Nombre del Plato</label>
-                            <input type="text" id="prop-nombre" placeholder="¿Qué plato sugieres?" class="w-full p-3 bg-white border-none rounded-xl focus:ring-2 focus:ring-purple-500">
-                            <button onclick="subirPropuesta()" class="w-full bg-purple-600 text-white font-bold py-3 rounded-xl hover:bg-purple-700 transition">POSTULAR PLATO</button>
+                        <h2 class="text-3xl font-bold mb-6 text-slate-800 tracking-tight">Nueva Propuesta</h2>
+                        <div class="glass-card p-8 space-y-5 transition-all-suave hover-elevate">
+                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Categoría</label>
+                            <select id="prop-cat" class="w-full p-4 bg-white/60 border border-white/30 rounded-xl focus:ring-2 focus:ring-purple-400 transition-all-suave"></select>
+                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Nombre del Plato</label>
+                            <input type="text" id="prop-nombre" placeholder="¿Qué plato sugieres?" class="w-full p-4 bg-white/60 border border-white/30 rounded-xl focus:ring-2 focus:ring-purple-400 transition-all-suave">
+                            <button onclick="subirPropuesta()" class="w-full bg-purple-800 text-white font-bold py-4 rounded-xl hover:bg-purple-900 transition-all-suave">POSTULAR PLATO</button>
                         </div>
                     </div>
                     <div>
-                        <div class="flex justify-between items-end mb-4">
-                            <h2 class="text-2xl font-bold text-white">Apoyar Ideas</h2>
-                            <span class="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full font-bold uppercase tracking-tighter">2 Votos Semanales</span>
+                        <div class="flex justify-between items-end mb-6">
+                            <h2 class="text-3xl font-bold text-slate-800 tracking-tight">Apoyar Ideas</h2>
+                            <span class="text-[10px] bg-purple-100 text-purple-800 px-3 py-1.5 rounded-full font-bold uppercase tracking-tighter">2 Votos Semanales</span>
                         </div>
-                        <div id="lista-propuestas" class="space-y-3 max-h-[500px] overflow-y-auto pr-2">
-                            <p class="text-center text-slate-400 py-10 animate-pulse">Cargando propuestas...</p>
+                        <div id="lista-propuestas" class="space-y-4 max-h-[600px] overflow-y-auto pr-3">
+                            <p class="text-center text-slate-500 py-10 animate-pulse glass-card rounded-2xl">Cargando propuestas...</p>
                         </div>
                     </div>
                 </div>
             </section>
 
             <section id="resultado" class="section-content hidden">
-                <header class="mb-8 flex justify-between items-end">
+                <header class="mb-10 flex justify-between items-end gap-4">
                     <div>
-                        <h2 class="text-3xl font-black text-white">Resultados del Día</h2>
-                        <p class="text-white/80 text-sm italic">Opciones ganadoras para mañana (Horario restringido).</p>
+                        <h2 class="text-4xl font-black text-slate-800 tracking-tighter">Resultados del Día</h2>
+                        <p class="text-slate-600 text-sm mt-1">Opciones ganadoras para mañana (Ciclo 13:00 - 16:40).</p>
                     </div>
-                    <button onclick="renderStats()" class="bg-purple-100 text-purple-700 px-4 py-2 rounded-xl text-xs font-bold hover:bg-purple-200">
+                    <button onclick="renderStats()" class="bg-purple-100 text-purple-800 px-5 py-3 rounded-xl text-xs font-bold hover:bg-purple-200 transition-all-suave flex items-center gap-2 whitespace-nowrap">
                         REFRESCAR ↻
                     </button>
                 </header>
-                <div id="resultados-grid" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3"></div>
-                <div class="mt-12 backdrop-blur-sm bg-white/80 p-6 rounded-2xl shadow-xl border border-white/20">
-                    <h3 class="font-bold text-slate-400 uppercase text-[10px] mb-4 tracking-widest">Acumulado Histórico</h3>
-                    <canvas id="statsChart"></canvas>
+                <div id="resultados-grid" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-12"></div>
+                
+                <div class="mt-12 glass-card p-8 transition-all-suave hover-elevate">
+                    <h3 class="font-bold text-slate-500 uppercase text-[10px] mb-6 tracking-widest">Acumulado Histórico</h3>
+                    <div class="h-[400px]">
+                        <canvas id="statsChart"></canvas>
+                    </div>
                 </div>
             </section>
 
             <section id="admin" class="section-content hidden">
-                <h2 class="text-2xl font-bold mb-6 italic text-white">Panel de Control de RRHH</h2>
-                <div class="mb-8">
-                    <h3 class="font-bold text-slate-100 text-xs uppercase mb-3">Gestión de Personal</h3>
-                    <div class="backdrop-blur-sm bg-white/80 rounded-2xl shadow-sm border border-white/20 overflow-hidden">
+                <h2 class="text-3xl font-bold mb-8 italic text-purple-800 tracking-tight">Panel de Control RRHH</h2>
+                <div class="mb-10">
+                    <h3 class="font-bold text-slate-500 text-xs uppercase mb-4 tracking-widest">Gestión de Personal</h3>
+                    <div class="glass-card rounded-2xl overflow-hidden transition-all-suave hover-elevate">
                         <div class="overflow-x-auto">
                             <table class="w-full text-left text-sm">
-                                <thead class="bg-slate-50 text-slate-400 font-bold uppercase text-[10px]">
-                                    <tr><th class="p-4">Usuario</th><th class="p-4">Nombre</th><th class="p-4">Rol</th><th class="p-4 text-center">Acción</th></tr>
+                                <thead class="bg-purple-950/5 text-purple-900 font-bold uppercase text-[10px]">
+                                    <tr><th class="p-5">Usuario</th><th class="p-5">Nombre</th><th class="p-5">Rol</th><th class="p-5 text-center">Acción</th></tr>
                                 </thead>
-                                <tbody id="userTableBody"></tbody>
+                                <tbody id="userTableBody" class="bg-white/30"></tbody>
                             </table>
                         </div>
-                        <div class="p-4 bg-slate-50 border-t flex flex-wrap gap-2">
-                            <input type="text" id="nu" placeholder="Usuario" class="p-2 border rounded-lg text-sm flex-1 bg-white">
-                            <input type="text" id="nc" placeholder="Clave" class="p-2 border rounded-lg text-sm flex-1 bg-white">
-                            <input type="text" id="nn" placeholder="Nombre" class="p-2 border rounded-lg text-sm flex-1 bg-white">
-                            <select id="nr" class="p-2 border rounded-lg text-sm w-full md:w-auto bg-white"><option value="USER">USER</option><option value="ADMIN">ADMIN</option></select>
-                            <button onclick="addUser()" class="bg-purple-600 text-white px-6 py-2 rounded-lg font-bold text-sm w-full md:w-auto hover:bg-purple-700 transition">Añadir Colaborador</button>
+                        <div class="p-5 bg-white/20 border-t border-white/20 flex flex-wrap gap-3">
+                            <input type="text" id="nu" placeholder="Usuario" class="p-3 bg-white/60 border border-white/30 rounded-xl text-sm flex-1 focus:ring-2 focus:ring-purple-400 outline-none">
+                            <input type="text" id="nc" placeholder="Clave" class="p-3 bg-white/60 border border-white/30 rounded-xl text-sm flex-1 focus:ring-2 focus:ring-purple-400 outline-none">
+                            <input type="text" id="nn" placeholder="Nombre" class="p-3 bg-white/60 border border-white/30 rounded-xl text-sm flex-1 focus:ring-2 focus:ring-purple-400 outline-none">
+                            <select id="nr" class="p-3 bg-white/60 border border-white/30 rounded-xl text-sm focus:ring-2 focus:ring-purple-400 outline-none"><option value="USER">USER</option><option value="ADMIN">ADMIN</option></select>
+                            <button onclick="addUser()" class="bg-purple-800 text-white px-6 py-3 rounded-xl font-bold text-sm w-full md:w-auto hover:bg-purple-900 transition-all-suave">Añadir Colaborador</button>
                         </div>
                     </div>
                 </div>
@@ -185,10 +222,9 @@
             form.innerHTML = ''; propCat.innerHTML = '';
             for (const cat in menu) {
                 const div = document.createElement('div');
-                // Estilo Glass para las cards del menú diaria
-                div.className = "backdrop-blur-sm bg-white/80 p-5 rounded-2xl shadow-lg border border-white/20 glass-card";
-                div.innerHTML = `<label class="block font-black mb-3 text-purple-700 text-[10px] uppercase tracking-widest">${cat}</label>
-                    <select name="${cat}" class="w-full p-3 bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-purple-400" required>
+                div.className = "glass-card p-6 border border-white/30 transition-all-suave hover-elevate";
+                div.innerHTML = `<label class="block font-black mb-3 text-purple-900 text-[10px] uppercase tracking-widest">${cat}</label>
+                    <select name="${cat}" class="w-full p-3 bg-white/60 border border-white/30 rounded-xl outline-none focus:ring-2 focus:ring-purple-400 transition-all-suave" required>
                     <option value="">Seleccionar...</option>
                     ${menu[cat].map(o => `<option value="${o}">${o}</option>`).join('')}</select>`;
                 form.appendChild(div);
@@ -210,7 +246,7 @@
 
         async function cargarPropuestasParaVotar() {
             const container = document.getElementById('lista-propuestas');
-            container.innerHTML = '<p class="text-center text-slate-100 py-10 animate-pulse">Actualizando lista...</p>';
+            container.innerHTML = '<p class="text-center text-slate-500 py-10 text-sm animate-pulse glass-card rounded-2xl">Actualizando lista...</p>';
             try {
                 const res = await fetch(API_URL + "?action=get_propuestas");
                 const json = await res.json();
@@ -218,19 +254,18 @@
                     container.innerHTML = '';
                     json.propuestas.forEach(p => {
                         const div = document.createElement('div');
-                        // Estilo Glass para las cards de propuestas
-                        div.className = "backdrop-blur-sm bg-white/80 p-4 rounded-xl border border-white/10 flex justify-between items-center shadow-md glass-card transition-all";
+                        div.className = "glass-card p-4 flex justify-between items-center transition-all-suave hover-scale";
                         div.innerHTML = `
                             <div class="flex-1">
-                                <p class="text-[9px] font-bold text-purple-600 uppercase tracking-wider">${p.categoria}</p>
-                                <p class="font-bold text-slate-700 text-sm">${p.nombre}</p>
-                                <p class="text-[9px] text-slate-400 mt-1">Por: ${p.autor} | ${p.votos} Apoyos</p>
+                                <p class="text-[9px] font-bold text-purple-800 uppercase tracking-wider">${p.categoria}</p>
+                                <p class="font-bold text-slate-800 text-sm">${p.nombre}</p>
+                                <p class="text-[9px] text-slate-500 mt-1">Por: ${p.autor} | ${p.votos} Apoyos</p>
                             </div>
-                            <button onclick="apoyarPropuesta(${p.id})" class="bg-emerald-50 text-emerald-600 px-4 py-2 rounded-lg text-[10px] font-black hover:bg-emerald-600 hover:text-white transition uppercase">Apoyar</button>`;
+                            <button onclick="apoyarPropuesta(${p.id})" class="bg-purple-100 text-purple-900 px-4 py-2 rounded-lg text-[10px] font-black hover:bg-purple-800 hover:text-white transition uppercase tracking-widest">Apoyar</button>`;
                         container.appendChild(div);
                     });
-                } else { container.innerHTML = '<p class="text-center text-white py-10 italic">Sin propuestas esta semana.</p>'; }
-            } catch (e) { container.innerHTML = '<p class="text-center text-red-300 py-10 text-xs font-bold">Error de sincronización.</p>'; }
+                } else { container.innerHTML = '<p class="text-center text-slate-500 py-10 text-sm italic glass-card rounded-2xl">Sin propuestas esta semana.</p>'; }
+            } catch (e) { container.innerHTML = '<p class="text-center text-red-400 py-10 text-xs font-bold glass-card rounded-2xl">Error de sincronización.</p>'; }
         }
 
         async function apoyarPropuesta(filaId) {
@@ -260,9 +295,9 @@
         function renderUsers(users) {
             const tbody = document.getElementById('userTableBody');
             tbody.innerHTML = users.map(u => `
-                <tr class="border-b hover:bg-slate-50/50 transition">
-                    <td class="p-4 font-bold text-slate-700">${u[0]}</td><td class="p-4">${u[2]}</td><td class="p-4"><span class="px-2 py-1 rounded text-[10px] font-bold ${u[3] === 'ADMIN' ? 'bg-purple-100 text-purple-700' : 'bg-slate-100 text-slate-500'}">${u[3]}</span></td>
-                    <td class="p-4 text-center"><button onclick="deleteUser('${u[0]}')" class="text-red-400 hover:text-red-600 font-bold text-xs uppercase tracking-widest">Eliminar</button></td>
+                <tr class="border-b border-white/10 hover:bg-white/10 transition">
+                    <td class="p-5 font-bold text-slate-800">${u[0]}</td><td class="p-5 text-slate-700">${u[2]}</td><td class="p-5"><span class="px-2 py-1 rounded text-[10px] font-bold ${u[3] === 'ADMIN' ? 'bg-purple-200 text-purple-900' : 'bg-slate-100 text-slate-600'}">${u[3]}</span></td>
+                    <td class="p-5 text-center"><button onclick="deleteUser('${u[0]}')" class="text-red-500 hover:text-red-700 font-bold text-xs uppercase tracking-widest">Eliminar</button></td>
                 </tr>`).join('');
         }
 
@@ -291,46 +326,42 @@
             const min = ahora.getMinutes();
             const tiempoDecimal = hora + (min / 60);
             
-            // LÓGICA DE HORARIO: 13:00 (13.0) a 16:40 (16.66) - Mismo Día
+            // LÓGICA DE HORARIO: 13:00 (13.0) a 16:40 (16.66) - No cambiada
             const estaEnHorario = (tiempoDecimal >= 13) && (tiempoDecimal <= 16.66);
 
-            // Bloqueo visual Glass para 'votar' y 'resultado'
             if ((id === 'votar' || id === 'resultado') && !estaEnHorario && currentUser.rol !== 'ADMIN') {
                 const containerId = id === 'votar' ? 'voto-dinamico-container' : 'resultados-grid';
                 const container = document.getElementById(containerId);
                 if (container) {
                     container.innerHTML = `
-                        <div class="col-span-full backdrop-blur-sm bg-purple-50/80 border-2 border-purple-200 p-10 rounded-3xl text-center shadow-inner">
+                        <div class="col-span-full glass-card p-10 text-center border-white/20">
                             <p class="text-5xl mb-4">🙄</p>
-                            <h3 class="text-2xl font-black text-purple-900 mb-2">¡AH! ¿AHORA SI QUIERES VOTAR?</h3>
-                            <p class="text-purple-700 font-medium italic">Espera el horario establecido.</p>
-                            <div class="mt-6 inline-block bg-white px-4 py-2 rounded-full border border-purple-200 text-xs font-bold text-purple-600 uppercase tracking-widest">
+                            <h3 class="text-2xl font-black text-slate-800 mb-2 uppercase tracking-tight">¡AH! ¿AHORA SI QUIERES VOTAR?</h3>
+                            <p class="text-slate-600 font-medium italic text-sm">Espera el horario establecido, colega.</p>
+                            <div class="mt-6 inline-block bg-purple-800 px-4 py-2 rounded-full text-xs font-bold text-white uppercase tracking-widest shadow-md">
                                 Horario: 13:00 PM - 16:40 PM
                             </div>
                         </div>
                     `;
-                    // Ocultar gráfico histórico si está fuera de hora
                     if(id === 'resultado') {
-                         const statsCanvas = document.getElementById('statsChart');
-                         if(statsCanvas) statsCanvas.parentElement.classList.add('hidden');
+                        const canvasElement = document.getElementById('statsChart');
+                        if(canvasElement) canvasElement.parentElement.classList.add('hidden');
                     }
                 }
                 return; 
             }
 
-            // Gestión de resultados si está en hora
             if(id === 'resultado') {
-                const statsCanvas = document.getElementById('statsChart');
-                if(statsCanvas) statsCanvas.parentElement.classList.remove('hidden');
+                const canvasElement = document.getElementById('statsChart');
+                if(canvasElement) canvasElement.parentElement.classList.remove('hidden');
                 renderStats();
             }
-            // Proponer y Admin no tienen restricción
             if(id === 'proponer') cargarPropuestasParaVotar();
         }
 
         async function renderStats() {
             const grid = document.getElementById('resultados-grid');
-            grid.innerHTML = '<p class="col-span-full text-center text-white py-10 animate-pulse font-bold">Calculando podios por categoría...</p>';
+            grid.innerHTML = '<p class="col-span-full text-center text-purple-900 py-10 animate-bounce font-bold glass-card rounded-2xl border-white/30">Calculando podios...</p>';
             try {
                 const res = await fetch(API_URL + "?action=get_resultados_dia");
                 const json = await res.json();
@@ -338,29 +369,32 @@
                     grid.innerHTML = '';
                     for (const categoria in json.resultados) {
                         const card = document.createElement('div');
-                        // Estilo Glass para las cards de resultados
-                        card.className = "backdrop-blur-sm bg-white/80 p-6 rounded-3xl shadow-lg border border-white/20 flex flex-col h-full glass-card";
+                        card.className = "glass-card p-6 flex flex-col h-full border border-white/30 transition-all-suave hover-elevate";
                         card.innerHTML = `
-                            <div class="mb-4"><span class="bg-purple-50 text-purple-700 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">${categoria}</span></div>
+                            <div class="mb-4"><span class="bg-purple-100 text-purple-900 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">${categoria}</span></div>
                             <div class="space-y-4 flex-grow">${json.resultados[categoria].map((p, index) => `
-                                <div class="flex justify-between items-center p-2 rounded-xl ${index === 0 ? 'bg-amber-50/50' : 'bg-slate-50'}">
-                                    <div class="flex items-center gap-3"><span class="text-xl">${index === 0 ? '🥇' : '🥈'}</span><span class="text-sm font-bold text-slate-700">${p.nombre}</span></div>
-                                    <span class="text-[10px] font-black text-purple-500 bg-white px-2 py-1 rounded-md shadow-sm">${p.votos} VOTOS</span>
+                                <div class="flex justify-between items-center p-3 rounded-xl transition ${index === 0 ? 'bg-purple-800/80 text-white shadow-lg' : 'bg-white/40 text-slate-800'}">
+                                    <div class="flex items-center gap-3"><span class="text-xl">${index === 0 ? '🥇' : '🥈'}</span><span class="text-sm font-bold">${p.nombre}</span></div>
+                                    <span class="text-[10px] font-black px-2 py-1 rounded-md shadow-inner ${index === 0 ? 'bg-white/20 text-white' : 'bg-white/80 text-purple-900'}">${p.votos} VOTOS</span>
                                 </div>`).join('')}</div>`;
                         grid.appendChild(card);
                     }
-                } else { grid.innerHTML = '<p class="col-span-full text-center text-white py-10 italic">No hay votos registrados en este ciclo.</p>'; }
-            } catch (e) { grid.innerHTML = '<p class="col-span-full text-center text-red-300 py-10">Error de conexión.</p>'; }
+                } else { grid.innerHTML = '<p class="col-span-full text-center text-slate-500 py-10 glass-card rounded-2xl">No hay votos registrados.</p>'; }
+            } catch (e) { grid.innerHTML = '<p class="col-span-full text-center text-red-400 py-10 glass-card rounded-2xl">Error de conexión.</p>'; }
 
-            // Refrescar analítica histórica con colores morados
             const histRes = await fetch(API_URL + "?action=get_stats");
             const histData = await histRes.json();
             const ctx = document.getElementById('statsChart').getContext('2d');
+            
+            // Configuración seria para Chart.js
+            Chart.defaults.color = '#475569'; // slate-600
+            Chart.defaults.font.family = 'ui-sans-serif, system-ui, sans-serif';
+
             if (window.chartObj) window.chartObj.destroy();
             window.chartObj = new Chart(ctx, {
                 type: 'bar',
-                data: { labels: Object.keys(histData.stats), datasets: [{ label: 'Votos', data: Object.values(histData.stats), backgroundColor: '#a855f7', borderRadius: 5 }] },
-                options: { indexAxis: 'y', plugins: { legend: { display: false } } }
+                data: { labels: Object.keys(histData.stats), datasets: [{ label: 'Votos', data: Object.values(histData.stats), backgroundColor: 'rgba(107, 33, 168, 0.7)', borderColor: '#6b21a8', borderWidth: 1, borderRadius: 8 }] },
+                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } }, y: { grid: { color: 'rgba(255,255,255,0.1)' } } } }
             });
         }
 
