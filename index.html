@@ -179,6 +179,27 @@
             </section>
         </main>
     </div>
+<div class="mt-12">
+    <h3 class="font-bold text-slate-500 text-xs uppercase mb-4 tracking-widest">Gestión del Menú (Opciones)</h3>
+    <div class="glass-card rounded-2xl p-6 transition-all-suave hover-elevate">
+        <div id="admin-menu-container" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
+            </div>
+        
+        <div class="p-5 bg-white/20 border-t border-white/20 rounded-xl flex flex-wrap gap-3 items-end">
+            <div class="flex-1 min-w-[150px]">
+                <label class="text-[9px] font-bold text-slate-500 uppercase ml-2">Categoría</label>
+                <select id="new-opt-cat" class="w-full p-3 bg-white/60 border border-white/30 rounded-xl text-sm focus:ring-2 focus:ring-purple-400 outline-none"></select>
+            </div>
+            <div class="flex-[2] min-w-[200px]">
+                <label class="text-[9px] font-bold text-slate-500 uppercase ml-2">Nombre del Nuevo Plato</label>
+                <input type="text" id="new-opt-nombre" placeholder="Ej: Lomo Saltado" class="w-full p-3 bg-white/60 border border-white/30 rounded-xl text-sm focus:ring-2 focus:ring-purple-400 outline-none">
+            </div>
+            <button onclick="addOption()" class="bg-purple-800 text-white px-8 py-3 rounded-xl font-bold text-sm hover:bg-purple-900 transition-all-suave h-[46px]">
+                Añadir Plato
+            </button>
+        </div>
+    </div>
+</div>
 
     <script>
         const API_URL = "https://script.google.com/macros/s/AKfycby_MDZMaCd1JP20Hep8K1aiKzDshGomr_kDsoNZHVguqzhjCHrPu9uTxryIjDTyz4k/exec"; 
@@ -214,15 +235,17 @@
         }
 
         async function fetchData() {
-            try {
-                const res = await fetch(API_URL + "?action=get_opciones");
-                const json = await res.json();
-                renderMenu(json.data);
-                if (currentUser.rol === 'ADMIN') {
-                    const userRes = await fetch(API_URL + "?action=get_usuarios");
-                    const userData = await userRes.json();
-                    renderUsers(userData.users);
-                }
+    try {
+        const res = await fetch(API_URL + "?action=get_opciones");
+        const json = await res.json();
+        renderMenu(json.data);
+        
+        if (currentUser.rol === 'ADMIN') {
+            renderMenuAdmin(json.data); // <-- Añade esta línea
+            const userRes = await fetch(API_URL + "?action=get_usuarios");
+            const userData = await userRes.json();
+            renderUsers(userData.users);
+        }
             } catch (e) {
         console.error("Error detallado:", e); // Esto te dirá qué falló exactamente en la consola
         grid.innerHTML = '<p class="col-span-full text-center text-red-400 py-10 glass-card rounded-2xl">Error de sincronización con el servidor.</p>';
@@ -470,6 +493,63 @@
             `).join('')}
         </div>
     `;
+}
+
+function renderMenuAdmin(menu) {
+    const container = document.getElementById('admin-menu-container');
+    const selectAdd = document.getElementById('new-opt-cat');
+    container.innerHTML = '';
+    selectAdd.innerHTML = '';
+
+    for (const cat in menu) {
+        // Llenar el selector de "Añadir"
+        selectAdd.innerHTML += `<option value="${cat}">${cat}</option>`;
+
+        // Crear tarjeta de categoría para gestión
+        const card = document.createElement('div');
+        card.className = "bg-white/30 p-4 rounded-xl border border-white/20";
+        card.innerHTML = `
+            <p class="text-[10px] font-black text-purple-900 uppercase mb-3 border-b border-purple-900/10 pb-1">${cat}</p>
+            <div class="space-y-2">
+                ${menu[cat].map(plato => `
+                    <div class="flex justify-between items-center text-xs bg-white/40 p-2 rounded-lg group">
+                        <span class="text-slate-700 font-medium">${plato}</span>
+                        <button onclick="deleteOption('${cat}', '${plato}')" class="text-red-400 hover:text-red-600 font-bold opacity-0 group-hover:opacity-100 transition-opacity">
+                            ✕
+                        </button>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+        container.appendChild(card);
+    }
+}
+
+async function addOption() {
+    const categoria = document.getElementById('new-opt-cat').value;
+    const nombre = document.getElementById('new-opt-nombre').value;
+    if(!nombre) return alert("Escribe el nombre del plato.");
+
+    const res = await fetch(API_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'crud_admin', subAction: 'agregar', categoria, nombre })
+    });
+    const data = await res.json();
+    if(data.success) {
+        document.getElementById('new-opt-nombre').value = '';
+        fetchData(); // Recargamos todo
+    }
+}
+
+async function deleteOption(categoria, nombre) {
+    if(!confirm(`¿Eliminar "${nombre}" de la categoría ${categoria}?`)) return;
+
+    const res = await fetch(API_URL, {
+        method: 'POST',
+        body: JSON.stringify({ action: 'crud_admin', subAction: 'eliminar', categoria, nombre })
+    });
+    const data = await res.json();
+    if(data.success) fetchData();
 }
 
         function logout() { localStorage.removeItem('buffet_session'); location.reload(); }
