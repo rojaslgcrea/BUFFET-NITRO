@@ -269,33 +269,46 @@
             }
         }
 
-        async function enviarVotos() {
-            const btn = document.getElementById('btn-votar'); // Buscamos el botón
-            if (btn) btn.disabled = true; // LO DESACTIVAMOS DE INMEDIATO
-    
-            // ... resto de tu código de recolección de datos ...
-    
-            // Si la validación de campos falla, recuerda reactivarlo:
-           if (Object.values(selecciones).some(v => v === "")) {
-           if (btn) btn.disabled = false; 
-           return alert("⚠️ Selecciona una opción por categoría.");
-           }
-            const formData = new FormData(document.getElementById('voteForm'));
+       async function enviarVotos() {
+            const btn = document.getElementById('btn-votar');
+            const formElement = document.getElementById('voteForm');
+            
+            // 1. CAPTURAMOS los datos primero
+            const formData = new FormData(formElement);
             const selecciones = Object.fromEntries(formData);
-            if (Object.values(selecciones).some(v => v === "")) return alert("⚠️ Selecciona una opción por categoría antes de enviar.");
+
+            // 2. VALIDAMOS que no haya categorías vacías
+            if (Object.values(selecciones).some(v => v === "")) {
+                return alert("⚠️ Por favor, selecciona una opción en cada categoría antes de enviar.");
+            }
             
-            const res = await fetch(API_URL, {
-                method: 'POST',
-                body: JSON.stringify({ action: 'votar', usuario: currentUser.usuario, selecciones })
-            });
-            const data = await res.json();
-            
-            if (data.success) {
-                alert("✅ Voto registrado exitosamente.");
-                mostrarMensajeYaVoto(); 
-            } else {
-                alert(data.message);
-                if (data.message.includes("Ya registraste")) mostrarMensajeYaVoto();
+            // 3. DESACTIVAMOS el botón para evitar que hagan 5 clics
+            if (btn) btn.disabled = true;
+
+            try {
+                // 4. ENVIAMOS al servidor (Google Apps Script)
+                const res = await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'votar', usuario: currentUser.usuario, selecciones })
+                });
+                const data = await res.json();
+                
+                if (data.success) {
+                    alert("✅ ¡Voto registrado con éxito! Buen provecho.");
+                    mostrarMensajeYaVoto(); // Bloqueamos la interfaz
+                } else {
+                    alert(data.message);
+                    // Si el error es porque ya votó, bloqueamos la pantalla
+                    if (data.message.includes("Ya registraste") || data.message.includes("vivo")) {
+                        mostrarMensajeYaVoto();
+                    } else {
+                        // Si es otro error (ej. internet), reactivamos el botón
+                        if (btn) btn.disabled = false;
+                    }
+                }
+            } catch (e) {
+                alert("Error de conexión. Revisa tu internet e intenta de nuevo.");
+                if (btn) btn.disabled = false;
             }
         }
 
