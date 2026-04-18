@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -270,6 +270,16 @@
         }
 
         async function enviarVotos() {
+            const btn = document.getElementById('btn-votar'); // Buscamos el botón
+            if (btn) btn.disabled = true; // LO DESACTIVAMOS DE INMEDIATO
+    
+            // ... resto de tu código de recolección de datos ...
+    
+            // Si la validación de campos falla, recuerda reactivarlo:
+           if (Object.values(selecciones).some(v => v === "")) {
+           if (btn) btn.disabled = false; 
+           return alert("⚠️ Selecciona una opción por categoría.");
+           }
             const formData = new FormData(document.getElementById('voteForm'));
             const selecciones = Object.fromEntries(formData);
             if (Object.values(selecciones).some(v => v === "")) return alert("⚠️ Selecciona una opción por categoría antes de enviar.");
@@ -368,21 +378,27 @@
 
             const ahora = new Date(), hora = ahora.getHours(), min = ahora.getMinutes(), tiempoDecimal = hora + (min / 60);
             const estaEnHorario = (tiempoDecimal >= 13) && (tiempoDecimal <= 16.66);
+            const container = document.getElementById('voto-dinamico-container');
 
             if (id === 'votar') {
+                if (container) container.classList.add('hidden'); // 1. Ocultar preventivamente mientras validamos
+
                 if (!estaEnHorario && currentUser.rol !== 'ADMIN') {
-                    const container = document.getElementById('voto-dinamico-container');
                     if (container) {
+                        container.classList.remove('hidden');
                         container.innerHTML = `<div class="col-span-full glass-card p-10 text-center border-white/20"><p class="text-5xl mb-4">🙄</p><h3 class="text-2xl font-black text-slate-800 mb-2 uppercase">¡AH! ¿AHORA SI QUIERES VOTAR?</h3><p class="text-slate-600 font-medium italic text-sm">Espera el horario establecido, colega.</p><div class="mt-6 inline-block bg-purple-800 px-4 py-2 rounded-full text-xs font-bold text-white uppercase shadow-md">Horario: 13:00 PM - 16:40 PM</div></div>`;
                     }
                     return;
                 } else {
+                    // 2. VERIFICACIÓN PERSISTENTE: Preguntar al servidor antes de mostrar nada
                     fetch(API_URL + "?action=check_voto_usuario&usuario=" + currentUser.usuario)
                         .then(res => res.json())
-                        .then(data => { if (data.yaVoto) mostrarMensajeYaVoto(); });
+                        .then(data => { 
+                            if (container) container.classList.remove('hidden'); // 3. Mostrar contenedor tras validar
+                            if (data.yaVoto) mostrarMensajeYaVoto(); // 4. Si ya votó, sobreescribir con el mensaje sarcástico
+                        });
                 }
             }
-
             if(id === 'resultado') renderStats();
             if(id === 'proponer') cargarPropuestasParaVotar();
         }
