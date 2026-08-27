@@ -1,4 +1,4 @@
-<<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -151,6 +151,16 @@
                     </button>
                 </header>
                 
+                <!-- CARD: VOTANTES DEL DÍA (TODOS LOS USUARIOS) -->
+                <div id="votantes-card" class="hidden mb-10 glass-card p-6 border-white/40 border-2">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="text-2xl">👥</span>
+                        <h3 class="font-black text-slate-800 uppercase tracking-tighter">Votantes de Hoy</h3>
+                        <span id="votantes-count" class="ml-auto bg-purple-100 text-purple-900 px-3 py-1 rounded-full text-xs font-bold">0</span>
+                    </div>
+                    <div id="lista-votantes" class="flex flex-wrap gap-2"></div>
+                </div>
+
                 <div id="ultima-comida-card" class="hidden mb-10 glass-card p-6 border-white/40 border-2">
                     <div class="flex items-center gap-3 mb-4">
                         <span class="text-2xl">🍽️</span>
@@ -215,12 +225,36 @@
     </div>
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbxL6TJZyTpHcrzBj5LQTBaDlSerz93fhsX9w2HHdFsKettuDs7WhM5c0tZ8GHG8ur0/exec"; 
+        const API_URL = "https://script.google.com/macros/s/AKfycbxk7SxrEDGNaAHGnt-RrqqcZ3RQVAcVCUKB3iiKUfzqVIq0mayVxbYZXWmfS84MoO0/exec"; 
         let currentUser = JSON.parse(localStorage.getItem('buffet_session'));
+        let sessionVerificationInterval = null;
 
         document.addEventListener('DOMContentLoaded', () => {
             if (currentUser) loginSuccess(currentUser);
         });
+
+        // =============================================
+        // FUNCIÓN: VERIFICAR SESIÓN VÁLIDA
+        // =============================================
+        async function verificarSesionValida() {
+            if (!currentUser) return false;
+            
+            try {
+                const res = await fetch(API_URL + "?action=check_usuario_existe&usuario=" + currentUser.usuario);
+                const data = await res.json();
+                
+                if (!data.success || !data.existe) {
+                    // El usuario fue eliminado, forzar cierre de sesión
+                    alert("⚠️ Tu usuario ha sido desactivado. Contacta a RRHH.");
+                    logout();
+                    return false;
+                }
+                return true;
+            } catch (e) {
+                console.error("Error verificando sesión:", e);
+                return true; // Si hay error de red, no forzar cierre
+            }
+        }
 
         async function handleLogin() {
             const usuario = document.getElementById('user-input').value;
@@ -244,7 +278,13 @@
             document.getElementById('welcome-msg').innerText = `👋 Hola, ${session.nombre}`;
             if (session.rol === 'ADMIN') document.getElementById('admin-nav').classList.remove('hidden');
             fetchData();
-            showSection('votar'); 
+            showSection('votar');
+            
+            // --- VERIFICAR SESIÓN CADA 30 SEGUNDOS ---
+            if (sessionVerificationInterval) clearInterval(sessionVerificationInterval);
+            sessionVerificationInterval = setInterval(async () => {
+                await verificarSesionValida();
+            }, 30000);
         }
 
         async function fetchData() {
@@ -284,7 +324,10 @@
             }
         }
 
-       async function enviarVotos() {
+        async function enviarVotos() {
+            // --- VALIDAR SESIÓN ANTES DE VOTAR ---
+            if (!await verificarSesionValida()) return;
+            
             const btn = document.getElementById('btn-votar');
             const formElement = document.getElementById('voteForm');
             
@@ -352,6 +395,9 @@
         }
 
         async function apoyarPropuesta(filaId) {
+            // --- VALIDAR SESIÓN ANTES DE APOYAR ---
+            if (!await verificarSesionValida()) return;
+            
             if(!confirm("¿Deseas apoyar esta propuesta?")) return;
             const res = await fetch(API_URL, {
                 method: 'POST',
@@ -363,6 +409,9 @@
         }
 
         async function subirPropuesta() {
+            // --- VALIDAR SESIÓN ANTES DE PROPONER ---
+            if (!await verificarSesionValida()) return;
+            
             const categoria = document.getElementById('prop-cat').value;
             const nombre = document.getElementById('prop-nombre').value;
             if(!nombre) return alert("Escribe el nombre del plato.");
@@ -409,7 +458,7 @@
             const container = document.getElementById('voto-dinamico-container');
 
             if (id === 'votar') {
-                if (container) container.classList.add('hidden'); // 1. Ocultar preventivamente mientras validamos
+                if (container) container.classList.add('hidden');
 
                 if (!estaEnHorario && currentUser.rol !== 'ADMIN') {
                     if (container) {
@@ -418,12 +467,11 @@
                     }
                     return;
                 } else {
-                    // 2. VERIFICACIÓN PERSISTENTE: Preguntar al servidor antes de mostrar nada
                     fetch(API_URL + "?action=check_voto_usuario&usuario=" + currentUser.usuario)
                         .then(res => res.json())
                         .then(data => { 
-                            if (container) container.classList.remove('hidden'); // 3. Mostrar contenedor tras validar
-                            if (data.yaVoto) mostrarMensajeYaVoto(); // 4. Si ya votó, sobreescribir con el mensaje sarcástico
+                            if (container) container.classList.remove('hidden');
+                            if (data.yaVoto) mostrarMensajeYaVoto();
                         });
                 }
             }
@@ -434,9 +482,42 @@
         async function renderStats() {
             const grid = document.getElementById('resultados-grid');
             const ultimaComidaCont = document.getElementById('ultima-comida-card');
+            const votantesCard = document.getElementById('votantes-card');
+            const listaVotantes = document.getElementById('lista-votantes');
+            const votantesCount = document.getElementById('votantes-count');
+            
             grid.innerHTML = '<p class="col-span-full text-center text-purple-900 py-10 animate-bounce font-bold">Calculando podios...</p>';
 
             try {
+                // --- OBTENER VOTANTES DEL DÍA (TODOS LOS USUARIOS) ---
+                const resVotantes = await fetch(API_URL + "?action=get_votantes_hoy");
+                const jsonVotantes = await resVotantes.json();
+                if (jsonVotantes.success && jsonVotantes.votantes.length > 0) {
+                    votantesCard.classList.remove('hidden');
+                    
+                    // Contar cuántos votaron y cuántos no
+                    const votaron = jsonVotantes.votantes.filter(v => v.voto === true);
+                    const noVotaron = jsonVotantes.votantes.filter(v => v.voto === false);
+                    votantesCount.textContent = `${votaron.length} ✅ / ${noVotaron.length} ❌`;
+                    
+                    // Mostrar lista con colores (verde para los que votaron, rojo para los que no)
+                    listaVotantes.innerHTML = jsonVotantes.votantes.map(v => {
+                        const claseColor = v.voto 
+                            ? 'bg-green-100 text-green-800 border-green-300' 
+                            : 'bg-red-100 text-red-800 border-red-300';
+                        const icono = v.voto ? '✅' : '❌';
+                        return `
+                            <span class="px-4 py-2 rounded-full border text-sm font-medium ${claseColor}">
+                                ${icono} ${v.nombre}
+                            </span>
+                        `;
+                    }).join('');
+                    
+                } else {
+                    votantesCard.classList.add('hidden');
+                }
+
+                // --- OBTENER ÚLTIMA COMIDA ---
                 const resAnterior = await fetch(API_URL + "?action=get_ultima_comida");
                 const jsonAnterior = await resAnterior.json();
                 if (jsonAnterior.success && Object.keys(jsonAnterior.menuAnterior).length > 0) {
@@ -446,8 +527,11 @@
                             <span class="text-purple-900 block text-[9px] font-black uppercase">${cat}</span>
                             <span class="text-slate-800 text-sm font-bold">${plato}</span>
                         </div>`).join('');
+                } else {
+                    ultimaComidaCont.classList.add('hidden');
                 }
 
+                // --- OBTENER RESULTADOS DEL DÍA ---
                 const res = await fetch(API_URL + "?action=get_resultados_dia");
                 const json = await res.json();
                 if (json.success && Object.keys(json.resultados).length > 0) {
@@ -467,6 +551,7 @@
 
             } catch (e) { grid.innerHTML = '<p class="col-span-full text-center text-red-400 py-10">Error de conexión.</p>'; }
 
+            // --- ACUMULADO HISTÓRICO ---
             const histRes = await fetch(API_URL + "?action=get_stats");
             const histData = await histRes.json();
             const statsContainer = document.getElementById('statsChart').parentElement;
@@ -532,7 +617,14 @@
             }
         }
         
-        function logout() { localStorage.removeItem('buffet_session'); location.reload(); }
+        function logout() { 
+            localStorage.removeItem('buffet_session');
+            if (sessionVerificationInterval) {
+                clearInterval(sessionVerificationInterval);
+                sessionVerificationInterval = null;
+            }
+            location.reload(); 
+        }
     </script>
 </body>
 </html>
