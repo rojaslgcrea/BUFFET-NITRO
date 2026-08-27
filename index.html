@@ -50,6 +50,14 @@
         ::-webkit-scrollbar-track { background: rgba(255,255,255,0.1); }
         ::-webkit-scrollbar-thumb { background: rgba(107, 33, 168, 0.3); border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(107, 33, 168, 0.5); }
+
+        /* 6. Estilos para el ciclo info */
+        .ciclo-info {
+            font-size: 9px;
+            color: #64748b;
+            font-weight: 400;
+            margin-left: 8px;
+        }
     </style>
 </head>
 <body class="min-h-screen font-sans text-slate-900">
@@ -144,7 +152,7 @@
                 <header class="mb-10 flex justify-between items-end gap-4">
                     <div>
                         <h2 class="text-4xl font-black text-slate-800 tracking-tighter">Resultados del Día</h2>
-                        <p class="text-slate-600 text-sm mt-1">Opciones ganadoras para mañana (Ciclo 13:00 - 16:40).</p>
+                        <p class="text-slate-600 text-sm mt-1">Opciones ganadoras para mañana (Ciclo 13:00 - 13:00).</p>
                     </div>
                     <button onclick="renderStats()" class="bg-purple-100 text-purple-800 px-5 py-3 rounded-xl text-xs font-bold hover:bg-purple-200 transition-all-suave flex items-center gap-2 whitespace-nowrap">
                         REFRESCAR ↻
@@ -155,7 +163,7 @@
                 <div id="votantes-card" class="hidden mb-10 glass-card p-6 border-white/40 border-2">
                     <div class="flex items-center gap-3 mb-4">
                         <span class="text-2xl">👥</span>
-                        <h3 class="font-black text-slate-800 uppercase tracking-tighter">Votantes de Hoy</h3>
+                        <h3 class="font-black text-slate-800 uppercase tracking-tighter">Votantes del Ciclo</h3>
                         <span id="votantes-count" class="ml-auto bg-purple-100 text-purple-900 px-3 py-1 rounded-full text-xs font-bold">0</span>
                     </div>
                     <div id="lista-votantes" class="flex flex-wrap gap-2"></div>
@@ -225,7 +233,7 @@
     </div>
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbxk7SxrEDGNaAHGnt-RrqqcZ3RQVAcVCUKB3iiKUfzqVIq0mayVxbYZXWmfS84MoO0/exec"; 
+        const API_URL = "https://script.google.com/macros/s/AKfycbwTrc-qPk_khjEtw8hWalPUUt6Z0QWSAfqiXml8-zbhvaNYTvVlhS3DHqOf8TYwTAk/exec"; 
         let currentUser = JSON.parse(localStorage.getItem('buffet_session'));
         let sessionVerificationInterval = null;
 
@@ -453,14 +461,20 @@
             const tab = document.getElementById('tab-' + id);
             if(tab) tab.classList.add('active-tab');
 
-            const ahora = new Date(), hora = ahora.getHours(), min = ahora.getMinutes(), tiempoDecimal = hora + (min / 60);
-            const estaEnHorario = (tiempoDecimal >= 13) && (tiempoDecimal <= 16.66);
+            const ahora = new Date();
+            const hora = ahora.getHours();
+            const estaEnHorario = (hora >= 13 && hora < 24) || (hora >= 0 && hora < 13);
             const container = document.getElementById('voto-dinamico-container');
 
             if (id === 'votar') {
                 if (container) container.classList.add('hidden');
 
-                if (!estaEnHorario && currentUser.rol !== 'ADMIN') {
+                // El horario de votación es de 13:00 a 13:00 del día siguiente
+                // Pero la votación solo está disponible de 13:00 a 16:40
+                const horaVotacion = hora + (ahora.getMinutes() / 60);
+                const puedeVotar = (horaVotacion >= 13) && (horaVotacion <= 16.66);
+                
+                if (!puedeVotar && currentUser.rol !== 'ADMIN') {
                     if (container) {
                         container.classList.remove('hidden');
                         container.innerHTML = `<div class="col-span-full glass-card p-10 text-center border-white/20"><p class="text-5xl mb-4">🙄</p><h3 class="text-2xl font-black text-slate-800 mb-2 uppercase">¡AH! ¿AHORA SI QUIERES VOTAR?</h3><p class="text-slate-600 font-medium italic text-sm">Espera el horario establecido, colega.</p><div class="mt-6 inline-block bg-purple-800 px-4 py-2 rounded-full text-xs font-bold text-white uppercase shadow-md">Horario: 13:00 PM - 16:40 PM</div></div>`;
@@ -494,6 +508,39 @@
                 const jsonVotantes = await resVotantes.json();
                 if (jsonVotantes.success && jsonVotantes.votantes.length > 0) {
                     votantesCard.classList.remove('hidden');
+                    
+                    // Mostrar información del ciclo
+                    if (jsonVotantes.ciclo) {
+                        const inicio = new Date(jsonVotantes.ciclo.inicio);
+                        const fin = new Date(jsonVotantes.ciclo.fin);
+                        const inicioStr = inicio.toLocaleString('es-PE', { 
+                            hour12: true, 
+                            hour: '2-digit', 
+                            minute: '2-digit',
+                            day: '2-digit',
+                            month: '2-digit'
+                        });
+                        const finStr = fin.toLocaleString('es-PE', { 
+                            hour12: true, 
+                            hour: '2-digit', 
+                            minute: '2-digit',
+                            day: '2-digit',
+                            month: '2-digit'
+                        });
+                        
+                        // Agregar subtítulo con el ciclo
+                        const header = votantesCard.querySelector('.flex.items-center.gap-3.mb-4');
+                        if (header) {
+                            // Eliminar ciclo info anterior si existe
+                            const oldCicloInfo = header.querySelector('.ciclo-info');
+                            if (oldCicloInfo) oldCicloInfo.remove();
+                            
+                            const cicloInfo = document.createElement('span');
+                            cicloInfo.className = 'ciclo-info';
+                            cicloInfo.textContent = `🔄 ${inicioStr} - ${finStr}`;
+                            header.appendChild(cicloInfo);
+                        }
+                    }
                     
                     // Contar cuántos votaron y cuántos no
                     const votaron = jsonVotantes.votantes.filter(v => v.voto === true);
@@ -549,21 +596,28 @@
                     }
                 } else { grid.innerHTML = '<p class="col-span-full text-center text-slate-500 py-10">Sin votos registrados.</p>'; }
 
-            } catch (e) { grid.innerHTML = '<p class="col-span-full text-center text-red-400 py-10">Error de conexión.</p>'; }
+            } catch (e) { 
+                console.error("Error en renderStats:", e);
+                grid.innerHTML = '<p class="col-span-full text-center text-red-400 py-10">Error de conexión.</p>'; 
+            }
 
             // --- ACUMULADO HISTÓRICO ---
-            const histRes = await fetch(API_URL + "?action=get_stats");
-            const histData = await histRes.json();
-            const statsContainer = document.getElementById('statsChart').parentElement;
-            statsContainer.innerHTML = `<h3 class="font-bold text-slate-500 uppercase text-[10px] mb-6 tracking-widest text-center">Top 5 Histórico</h3>
-                <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">${Object.entries(histData.stats).map(([cat, platos]) => `
-                    <div class="bg-white/20 p-4 rounded-2xl border border-white/10 transition-all-suave hover-elevate">
-                        <p class="text-[9px] font-black text-purple-900 uppercase mb-3 border-b border-purple-900/10 pb-1">${cat}</p>
-                        <div class="space-y-2">${platos.map((p, i) => `
-                            <div class="flex justify-between items-center text-xs">
-                                <span class="text-slate-700 truncate mr-2"><span class="font-bold text-purple-800">${i + 1}.</span> ${p.nombre}</span>
-                                <span class="bg-purple-900/10 px-2 py-0.5 rounded text-purple-900 font-bold">${p.votos}</span>
-                            </div>`).join('')}</div></div>`).join('')}</div>`;
+            try {
+                const histRes = await fetch(API_URL + "?action=get_stats");
+                const histData = await histRes.json();
+                const statsContainer = document.getElementById('statsChart').parentElement;
+                statsContainer.innerHTML = `<h3 class="font-bold text-slate-500 uppercase text-[10px] mb-6 tracking-widest text-center">Top 5 Histórico</h3>
+                    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">${Object.entries(histData.stats).map(([cat, platos]) => `
+                        <div class="bg-white/20 p-4 rounded-2xl border border-white/10 transition-all-suave hover-elevate">
+                            <p class="text-[9px] font-black text-purple-900 uppercase mb-3 border-b border-purple-900/10 pb-1">${cat}</p>
+                            <div class="space-y-2">${platos.map((p, i) => `
+                                <div class="flex justify-between items-center text-xs">
+                                    <span class="text-slate-700 truncate mr-2"><span class="font-bold text-purple-800">${i + 1}.</span> ${p.nombre}</span>
+                                    <span class="bg-purple-900/10 px-2 py-0.5 rounded text-purple-900 font-bold">${p.votos}</span>
+                                </div>`).join('')}</div></div>`).join('')}</div>`;
+            } catch (e) {
+                console.error("Error cargando histórico:", e);
+            }
         }
 
         function renderMenuAdmin(menu) {
