@@ -7,9 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* ESTILOS CSS PERSONALIZADOS (Prontis Aesthetic) */
-        
-        /* 1. Fondo Machu Picchu Natural */
         body {
             background-image: url('https://cdn.pixabay.com/photo/2012/04/26/22/48/machu-picchu-43387_1280.jpg');
             background-size: cover;
@@ -17,8 +14,6 @@
             background-attachment: fixed;
             background-repeat: no-repeat;
         }
-
-        /* 2. Efecto Cristal (Glassmorphism) Serio */
         .glass-card {
             background: rgba(255, 255, 255, 0.4);
             backdrop-filter: blur(12px);
@@ -26,44 +21,22 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
             box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
         }
-
-        /* 3. Animaciones Suaves Globales */
-        .transition-all-suave {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        /* 4. Efectos Hover Microinteracciones */
-        .hover-elevate:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-        }
-        
-        .hover-scale:hover {
-            transform: scale(1.02);
-        }
-
-        /* 5. Utilidades y Tabs */
+        .transition-all-suave { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .hover-elevate:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .hover-scale:hover { transform: scale(1.02); }
         .active-tab { border-bottom: 3px solid #6b21a8; font-weight: bold; color: #6b21a8; }
         .hidden { display: none; }
-        
-        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: rgba(255,255,255,0.1); }
         ::-webkit-scrollbar-thumb { background: rgba(107, 33, 168, 0.3); border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(107, 33, 168, 0.5); }
-
-        /* 6. Estilos para el ciclo info */
-        .ciclo-info {
-            font-size: 9px;
-            color: #64748b;
-            font-weight: 400;
-            margin-left: 8px;
-        }
+        .ciclo-info { font-size: 9px; color: #64748b; font-weight: 400; margin-left: 8px; }
+        input[type="date"]::-webkit-calendar-picker-indicator { cursor: pointer; }
     </style>
 </head>
 <body class="min-h-screen font-sans text-slate-900">
 
     <div id="login-screen" class="flex flex-col items-center justify-center min-h-screen p-4 relative">
-        
         <div class="flex flex-col items-center mb-0 w-full max-w-sm">
             <div class="glass-card p-5 rounded-3xl rounded-br-none border-white/40 shadow-xl -mb-32 relative">
                 <p class="text-sm font-bold text-slate-800 italic leading-tight text-center">
@@ -72,16 +45,12 @@
                 </p>
                 <div class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[10px] border-t-white/40"></div>
             </div>
-            
             <img src="https://i.ibb.co/N25tQ11y/Dise-o-sin-t-t-lo-Photoroom-1.png" 
-                 class="w-72 md:w-96 h-auto filter drop-shadow-xl" 
-                 alt="Mascota Nitro">
+                 class="w-72 md:w-96 h-auto filter drop-shadow-xl" alt="Mascota Nitro">
         </div>
-
         <div class="glass-card p-5 -mt-32 mb-10 rounded-3xl flex items-center justify-center border border-white/30 shadow-2xl">
             <img src="https://nitro-tienda.com/web/image/website/1/logo/Nitro?unique=6d3069e" alt="Logo Nitro" class="h-14">
         </div>
-        
         <div class="glass-card p-10 w-full max-w-md border border-white/20 transition-all-suave hover-elevate">
             <h1 class="text-2xl font-black text-center text-slate-800 mb-8 tracking-tighter uppercase">Gestión de Comedor</h1>
             <div class="space-y-5">
@@ -103,6 +72,8 @@
                     <button onclick="showSection('votar')" id="tab-votar" class="nav-link py-2 px-3 rounded-lg hover:bg-white/5 transition-all-suave">Votar</button>
                     <button onclick="showSection('proponer')" id="tab-proponer" class="nav-link py-2 px-3 rounded-lg hover:bg-white/5 transition-all-suave">Propuestas</button>
                     <button onclick="showSection('resultado')" id="tab-resultado" class="nav-link py-2 px-3 rounded-lg hover:bg-white/5 transition-all-suave">Resultados</button>
+                    <button onclick="showSection('gastos')" id="tab-gastos" class="nav-link py-2 px-3 rounded-lg hidden hover:bg-white/5 transition-all-suave">💰 Gastos</button>
+                    <button onclick="showSection('reportes')" id="tab-reportes" class="nav-link py-2 px-3 rounded-lg hidden hover:bg-white/5 transition-all-suave">📊 Reportes</button>
                     <button id="admin-nav" onclick="showSection('admin')" class="nav-link py-2 px-3 rounded-lg hidden hover:bg-white/5 transition-all-suave">Admin</button>
                     <button onclick="logout()" class="text-purple-300 border-l border-purple-800 pl-3 hover:text-white transition-all-suave">Salir</button>
                 </div>
@@ -158,8 +129,6 @@
                         REFRESCAR ↻
                     </button>
                 </header>
-                
-                <!-- CARD: VOTANTES DEL DÍA (TODOS LOS USUARIOS) -->
                 <div id="votantes-card" class="hidden mb-10 glass-card p-6 border-white/40 border-2">
                     <div class="flex items-center gap-3 mb-4">
                         <span class="text-2xl">👥</span>
@@ -168,7 +137,6 @@
                     </div>
                     <div id="lista-votantes" class="flex flex-wrap gap-2"></div>
                 </div>
-
                 <div id="ultima-comida-card" class="hidden mb-10 glass-card p-6 border-white/40 border-2">
                     <div class="flex items-center gap-3 mb-4">
                         <span class="text-2xl">🍽️</span>
@@ -176,20 +144,203 @@
                     </div>
                     <div id="lista-menu-anterior" class="flex flex-wrap gap-4 text-xs font-bold"></div>
                 </div>
-
                 <div id="resultados-grid" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-12"></div>
-                
                 <div class="mt-12 glass-card p-8 pb-16 transition-all-suave hover-elevate">
                     <h3 class="font-bold text-slate-500 uppercase text-[10px] mb-6 tracking-widest">Acumulado Histórico</h3>
-                    <div class="h-auto">
-                        <canvas id="statsChart"></canvas>
+                    <div class="h-auto"><canvas id="statsChart"></canvas></div>
+                </div>
+            </section>
+
+            <!-- ============================================================ -->
+            <!-- SECCIÓN GASTOS DE REFRIGERIO                                  -->
+            <!-- ============================================================ -->
+            <section id="gastos" class="section-content hidden">
+                <header class="mb-10">
+                    <h2 class="text-4xl font-black text-slate-800 tracking-tighter">🍽️ Gastos del Refrigerio</h2>
+                    <p class="text-slate-600 text-sm mt-1">Registra comensales y gastos diarios del buffet. Presupuesto: S/ 5 por persona.</p>
+                </header>
+
+                <!-- Presupuesto del día -->
+                <div class="glass-card p-6 md:p-8 rounded-3xl mb-6 transition-all-suave hover-elevate">
+                    <h3 class="text-[10px] font-black text-purple-900 uppercase tracking-widest mb-4">🥗 Presupuesto del día</h3>
+                    <div class="grid gap-4 md:grid-cols-4 items-end">
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Nº de comensales</label>
+                            <input type="number" id="g-num-comensales" min="0" step="1" placeholder="0" oninput="renderAhorroPreview()" class="w-full p-3 bg-white/60 border border-white/30 rounded-xl outline-none focus:ring-2 focus:ring-purple-400 transition-all-suave">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Presupuesto (S/)</label>
+                            <input type="text" id="g-presupuesto" readonly placeholder="0.00" class="w-full p-3 bg-white/40 border border-white/30 rounded-xl font-bold outline-none text-purple-900">
+                        </div>
+                        <button onclick="calcularPresupuesto()" class="bg-purple-100 text-purple-900 font-bold py-3 rounded-xl hover:bg-purple-200 transition-all-suave">Calcular</button>
+                        <button onclick="guardarComensales()" class="bg-purple-800 text-white font-bold py-3 rounded-xl hover:bg-purple-900 transition-all-suave">Guardar</button>
+                    </div>
+                    <p id="g-comensales-guardados" class="text-[10px] text-slate-500 italic mt-3"></p>
+                </div>
+
+                <!-- Agregar gasto + Staging -->
+                <div class="glass-card p-6 md:p-8 rounded-3xl mb-6 transition-all-suave hover-elevate">
+                    <h3 class="text-[10px] font-black text-purple-900 uppercase tracking-widest mb-4">➕ Agregar gasto</h3>
+                    <div class="grid gap-4 md:grid-cols-[1fr_2fr_1fr_auto] items-end">
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Fecha</label>
+                            <input type="date" id="g-fecha" class="w-full p-3 bg-white/60 border border-white/30 rounded-xl outline-none focus:ring-2 focus:ring-purple-400 transition-all-suave">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Concepto</label>
+                            <input type="text" id="g-concepto" placeholder="Ej. Compra de víveres" class="w-full p-3 bg-white/60 border border-white/30 rounded-xl outline-none focus:ring-2 focus:ring-purple-400 transition-all-suave">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Monto (S/)</label>
+                            <input type="number" id="g-monto" min="0" step="0.01" placeholder="0.00" class="w-full p-3 bg-white/60 border border-white/30 rounded-xl outline-none focus:ring-2 focus:ring-purple-400 transition-all-suave">
+                        </div>
+                        <button onclick="anadirGastoStaging()" class="bg-purple-100 text-purple-900 font-bold px-6 py-3 rounded-xl hover:bg-purple-200 transition-all-suave">Añadir</button>
+                    </div>
+
+                    <!-- Lista temporal: gastos por grabar -->
+                    <div class="mt-8 border-t border-white/20 pt-5">
+                        <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
+                            <h4 class="text-[10px] font-black text-purple-900 uppercase tracking-widest">📋 Gastos por grabar (aún no guardados)</h4>
+                            <div class="flex items-center gap-4">
+                                <div class="flex items-baseline gap-2">
+                                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Total:</span>
+                                    <span id="g-staging-total" class="text-2xl font-black text-purple-900">0.00 S/</span>
+                                </div>
+                                <button onclick="grabarGastos()" id="g-btn-grabar" disabled class="bg-purple-800 text-white font-bold px-6 py-2 rounded-xl hover:bg-purple-900 transition-all-suave disabled:opacity-50 disabled:cursor-not-allowed">Grabar</button>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto max-h-56 overflow-y-auto rounded-xl bg-white/20">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-purple-950/5 text-purple-900 font-bold uppercase text-[10px] sticky top-0">
+                                    <tr>
+                                        <th class="p-2">Fecha</th>
+                                        <th class="p-2">Concepto</th>
+                                        <th class="p-2 text-right">Monto (S/)</th>
+                                        <th class="p-2 text-center">Quitar</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="g-staging-tabla" class="bg-white/30"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Previsualización de Ahorro del Día -->
+                <div class="glass-card p-6 md:p-8 rounded-3xl mb-6 transition-all-suave hover-elevate">
+                    <div class="flex flex-wrap justify-between items-center gap-4">
+                        <div>
+                            <h3 class="text-[10px] font-black text-purple-900 uppercase tracking-widest">💰 Ahorro del día (previsualización)</h3>
+                            <p class="text-[10px] text-slate-500 italic mt-1">Presupuesto calculado − gastos por grabar. Se reinicia al guardar y grabar.</p>
+                        </div>
+                        <span id="g-ahorro" class="text-3xl font-black text-slate-800">0.00 S/</span>
+                    </div>
+                </div>
+
+                <!-- Gastos ya grabados hoy -->
+                <div class="glass-card p-6 md:p-8 rounded-3xl transition-all-suave hover-elevate">
+                    <h3 class="text-[10px] font-black text-purple-900 uppercase tracking-widest mb-4">📌 Gastos grabados hoy</h3>
+                    <div class="overflow-x-auto max-h-72 overflow-y-auto rounded-xl bg-white/20">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-purple-950/5 text-purple-900 font-bold uppercase text-[10px] sticky top-0">
+                                <tr>
+                                    <th class="p-3">Fecha</th>
+                                    <th class="p-3">Concepto</th>
+                                    <th class="p-3 text-right">Monto (S/)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="g-tabla-hoy" class="bg-white/30"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============================================================ -->
+            <!-- SECCIÓN REPORTES DE GASTOS                                    -->
+            <!-- ============================================================ -->
+            <section id="reportes" class="section-content hidden">
+                <header class="mb-10">
+                    <h2 class="text-4xl font-black text-slate-800 tracking-tighter">📊 Reportes de Gastos</h2>
+                    <p class="text-slate-600 text-sm mt-1">Indicadores del refrigerio por rango de fechas y del mes en curso.</p>
+                </header>
+
+                <!-- Filtro por rango -->
+                <div class="glass-card p-6 md:p-8 rounded-3xl mb-6 transition-all-suave hover-elevate">
+                    <h3 class="text-[10px] font-black text-purple-900 uppercase tracking-widest mb-4">🔍 Filtrar por rango</h3>
+                    <div class="grid gap-4 md:grid-cols-[1fr_1fr_auto] items-end mb-8">
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Desde</label>
+                            <input type="date" id="r-desde" class="w-full p-3 bg-white/60 border border-white/30 rounded-xl outline-none focus:ring-2 focus:ring-purple-400 transition-all-suave">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Hasta</label>
+                            <input type="date" id="r-hasta" class="w-full p-3 bg-white/60 border border-white/30 rounded-xl outline-none focus:ring-2 focus:ring-purple-400 transition-all-suave">
+                        </div>
+                        <button onclick="renderReportesSeccion()" class="bg-purple-800 text-white font-bold px-6 py-3 rounded-xl hover:bg-purple-900 transition-all-suave">Aplicar</button>
+                    </div>
+                    <div class="grid gap-6 md:grid-cols-3">
+                        <div class="bg-white/30 p-5 rounded-2xl border border-white/20">
+                            <div class="text-[10px] font-black text-purple-900 uppercase tracking-widest mb-1">Gasto total</div>
+                            <div id="r-filtro-total" class="text-3xl font-black text-slate-800">0.00</div>
+                            <div class="text-[10px] text-slate-500 uppercase">Soles</div>
+                        </div>
+                        <div class="bg-white/30 p-5 rounded-2xl border border-white/20">
+                            <div class="text-[10px] font-black text-purple-900 uppercase tracking-widest mb-1">Per cápita</div>
+                            <div id="r-filtro-percapita" class="text-3xl font-black text-slate-800">0.00</div>
+                            <div class="text-[10px] text-slate-500 uppercase">Soles</div>
+                        </div>
+                        <div class="bg-white/30 p-5 rounded-2xl border border-white/20">
+                            <div class="text-[10px] font-black text-purple-900 uppercase tracking-widest mb-1">Ahorro</div>
+                            <div id="r-filtro-ahorro" class="text-3xl font-black text-green-600">0.00</div>
+                            <div class="text-[10px] text-slate-500 uppercase">Soles</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mes en curso -->
+                <div class="glass-card p-6 md:p-8 rounded-3xl mb-6 transition-all-suave hover-elevate">
+                    <h3 class="text-[10px] font-black text-purple-900 uppercase tracking-widest mb-4">📆 Indicadores del mes en curso</h3>
+                    <div class="grid gap-6 md:grid-cols-3">
+                        <div class="bg-white/30 p-5 rounded-2xl border border-white/20">
+                            <div class="text-[10px] font-black text-purple-900 uppercase tracking-widest mb-1">Gasto total</div>
+                            <div id="r-mes-total" class="text-3xl font-black text-slate-800">0.00</div>
+                            <div class="text-[10px] text-slate-500 uppercase">Soles</div>
+                        </div>
+                        <div class="bg-white/30 p-5 rounded-2xl border border-white/20">
+                            <div class="text-[10px] font-black text-purple-900 uppercase tracking-widest mb-1">Per cápita</div>
+                            <div id="r-mes-percapita" class="text-3xl font-black text-slate-800">0.00</div>
+                            <div class="text-[10px] text-slate-500 uppercase">Soles</div>
+                        </div>
+                        <div class="bg-white/30 p-5 rounded-2xl border border-white/20">
+                            <div class="text-[10px] font-black text-purple-900 uppercase tracking-widest mb-1">Ahorro</div>
+                            <div id="r-mes-ahorro" class="text-3xl font-black text-green-600">0.00</div>
+                            <div class="text-[10px] text-slate-500 uppercase">Soles</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ====== NUEVO: Desglose de gastos del rango ====== -->
+                <div class="glass-card p-6 md:p-8 rounded-3xl transition-all-suave hover-elevate">
+                    <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
+                        <h3 class="text-[10px] font-black text-purple-900 uppercase tracking-widest">📋 Desglose de gastos en el rango</h3>
+                        <span id="r-desglose-count" class="bg-purple-100 text-purple-900 text-[10px] font-bold px-3 py-1 rounded-full">0 registros</span>
+                    </div>
+                    <div class="overflow-x-auto max-h-96 overflow-y-auto rounded-xl bg-white/20">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-purple-950/5 text-purple-900 font-bold uppercase text-[10px] sticky top-0">
+                                <tr>
+                                    <th class="p-3">Fecha</th>
+                                    <th class="p-3">Concepto</th>
+                                    <th class="p-3 text-right">Monto (S/)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="r-tabla-desglose" class="bg-white/30"></tbody>
+                        </table>
                     </div>
                 </div>
             </section>
 
             <section id="admin" class="section-content hidden">
                 <h2 class="text-3xl font-bold mb-8 italic text-purple-800 tracking-tight">Panel de Control RRHH</h2>
-                
                 <div class="mb-10">
                     <h3 class="font-bold text-slate-500 text-xs uppercase mb-4 tracking-widest">Gestión de Personal</h3>
                     <div class="glass-card rounded-2xl overflow-hidden transition-all-suave hover-elevate">
@@ -210,7 +361,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="mt-12">
                     <h3 class="font-bold text-slate-500 text-xs uppercase mb-4 tracking-widest">Gestión del Menú (Opciones)</h3>
                     <div class="glass-card rounded-2xl p-6 transition-all-suave hover-elevate">
@@ -233,7 +383,7 @@
     </div>
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbwTrc-qPk_khjEtw8hWalPUUt6Z0QWSAfqiXml8-zbhvaNYTvVlhS3DHqOf8TYwTAk/exec"; 
+        const API_URL = "https://script.google.com/macros/s/AKfycbyJe8YvqCHyq-R4SlGE0KwvMYrWF4OItpeYUh_R4TcTusj0H4n9B9KtpukpObQBpSM/exec"; 
         let currentUser = JSON.parse(localStorage.getItem('buffet_session'));
         let sessionVerificationInterval = null;
 
@@ -242,17 +392,14 @@
         });
 
         // =============================================
-        // FUNCIÓN: VERIFICAR SESIÓN VÁLIDA
+        // VERIFICAR SESIÓN VÁLIDA
         // =============================================
         async function verificarSesionValida() {
             if (!currentUser) return false;
-            
             try {
                 const res = await fetch(API_URL + "?action=check_usuario_existe&usuario=" + currentUser.usuario);
                 const data = await res.json();
-                
                 if (!data.success || !data.existe) {
-                    // El usuario fue eliminado, forzar cierre de sesión
                     alert("⚠️ Tu usuario ha sido desactivado. Contacta a RRHH.");
                     logout();
                     return false;
@@ -260,7 +407,7 @@
                 return true;
             } catch (e) {
                 console.error("Error verificando sesión:", e);
-                return true; // Si hay error de red, no forzar cierre
+                return true;
             }
         }
 
@@ -284,11 +431,16 @@
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('app-container').classList.remove('hidden');
             document.getElementById('welcome-msg').innerText = `👋 Hola, ${session.nombre}`;
-            if (session.rol === 'ADMIN') document.getElementById('admin-nav').classList.remove('hidden');
+            if (session.rol === 'ADMIN') {
+                document.getElementById('admin-nav').classList.remove('hidden');
+                document.getElementById('tab-gastos').classList.remove('hidden');
+                document.getElementById('tab-reportes').classList.remove('hidden');
+                fetchGastosData();
+                renderStaging();
+            }
             fetchData();
             showSection('votar');
             
-            // --- VERIFICAR SESIÓN CADA 30 SEGUNDOS ---
             if (sessionVerificationInterval) clearInterval(sessionVerificationInterval);
             sessionVerificationInterval = setInterval(async () => {
                 await verificarSesionValida();
@@ -300,7 +452,6 @@
                 const res = await fetch(API_URL + "?action=get_opciones");
                 const json = await res.json();
                 renderMenu(json.data);
-                
                 if (currentUser && currentUser.rol === 'ADMIN') {
                     renderMenuAdmin(json.data); 
                     const userRes = await fetch(API_URL + "?action=get_usuarios");
@@ -333,42 +484,29 @@
         }
 
         async function enviarVotos() {
-            // --- VALIDAR SESIÓN ANTES DE VOTAR ---
             if (!await verificarSesionValida()) return;
-            
             const btn = document.getElementById('btn-votar');
             const formElement = document.getElementById('voteForm');
-            
-            // 1. CAPTURAMOS los datos primero
             const formData = new FormData(formElement);
             const selecciones = Object.fromEntries(formData);
-
-            // 2. VALIDAMOS que no haya categorías vacías
             if (Object.values(selecciones).some(v => v === "")) {
                 return alert("⚠️ Por favor, selecciona una opción en cada categoría antes de enviar.");
             }
-            
-            // 3. DESACTIVAMOS el botón para evitar que hagan 5 clics
             if (btn) btn.disabled = true;
-
             try {
-                // 4. ENVIAMOS al servidor (Google Apps Script)
                 const res = await fetch(API_URL, {
                     method: 'POST',
                     body: JSON.stringify({ action: 'votar', usuario: currentUser.usuario, selecciones })
                 });
                 const data = await res.json();
-                
                 if (data.success) {
                     alert("✅ ¡Voto registrado con éxito! Buen provecho.");
-                    mostrarMensajeYaVoto(); // Bloqueamos la interfaz
+                    mostrarMensajeYaVoto();
                 } else {
                     alert(data.message);
-                    // Si el error es porque ya votó, bloqueamos la pantalla
                     if (data.message.includes("Ya registraste") || data.message.includes("vivo")) {
                         mostrarMensajeYaVoto();
                     } else {
-                        // Si es otro error (ej. internet), reactivamos el botón
                         if (btn) btn.disabled = false;
                     }
                 }
@@ -403,9 +541,7 @@
         }
 
         async function apoyarPropuesta(filaId) {
-            // --- VALIDAR SESIÓN ANTES DE APOYAR ---
             if (!await verificarSesionValida()) return;
-            
             if(!confirm("¿Deseas apoyar esta propuesta?")) return;
             const res = await fetch(API_URL, {
                 method: 'POST',
@@ -417,9 +553,7 @@
         }
 
         async function subirPropuesta() {
-            // --- VALIDAR SESIÓN ANTES DE PROPONER ---
             if (!await verificarSesionValida()) return;
-            
             const categoria = document.getElementById('prop-cat').value;
             const nombre = document.getElementById('prop-nombre').value;
             if(!nombre) return alert("Escribe el nombre del plato.");
@@ -463,17 +597,12 @@
 
             const ahora = new Date();
             const hora = ahora.getHours();
-            const estaEnHorario = (hora >= 13 && hora < 24) || (hora >= 0 && hora < 13);
             const container = document.getElementById('voto-dinamico-container');
 
             if (id === 'votar') {
                 if (container) container.classList.add('hidden');
-
-                // El horario de votación es de 13:00 a 13:00 del día siguiente
-                // Pero la votación solo está disponible de 13:00 a 16:40
                 const horaVotacion = hora + (ahora.getMinutes() / 60);
                 const puedeVotar = (horaVotacion >= 13) && (horaVotacion <= 16.66);
-                
                 if (!puedeVotar && currentUser.rol !== 'ADMIN') {
                     if (container) {
                         container.classList.remove('hidden');
@@ -491,6 +620,8 @@
             }
             if(id === 'resultado') renderStats();
             if(id === 'proponer') cargarPropuestasParaVotar();
+            if(id === 'gastos') renderGastosSeccion();
+            if(id === 'reportes') renderReportesSeccion();
         }
 
         async function renderStats() {
@@ -499,72 +630,37 @@
             const votantesCard = document.getElementById('votantes-card');
             const listaVotantes = document.getElementById('lista-votantes');
             const votantesCount = document.getElementById('votantes-count');
-            
             grid.innerHTML = '<p class="col-span-full text-center text-purple-900 py-10 animate-bounce font-bold">Calculando podios...</p>';
-
             try {
-                // --- OBTENER VOTANTES DEL DÍA (TODOS LOS USUARIOS) ---
                 const resVotantes = await fetch(API_URL + "?action=get_votantes_hoy");
                 const jsonVotantes = await resVotantes.json();
                 if (jsonVotantes.success && jsonVotantes.votantes.length > 0) {
                     votantesCard.classList.remove('hidden');
-                    
-                    // Mostrar información del ciclo
                     if (jsonVotantes.ciclo) {
                         const inicio = new Date(jsonVotantes.ciclo.inicio);
                         const fin = new Date(jsonVotantes.ciclo.fin);
-                        const inicioStr = inicio.toLocaleString('es-PE', { 
-                            hour12: true, 
-                            hour: '2-digit', 
-                            minute: '2-digit',
-                            day: '2-digit',
-                            month: '2-digit'
-                        });
-                        const finStr = fin.toLocaleString('es-PE', { 
-                            hour12: true, 
-                            hour: '2-digit', 
-                            minute: '2-digit',
-                            day: '2-digit',
-                            month: '2-digit'
-                        });
-                        
-                        // Agregar subtítulo con el ciclo
+                        const inicioStr = inicio.toLocaleString('es-PE', { hour12: true, hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' });
+                        const finStr = fin.toLocaleString('es-PE', { hour12: true, hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' });
                         const header = votantesCard.querySelector('.flex.items-center.gap-3.mb-4');
                         if (header) {
-                            // Eliminar ciclo info anterior si existe
                             const oldCicloInfo = header.querySelector('.ciclo-info');
                             if (oldCicloInfo) oldCicloInfo.remove();
-                            
                             const cicloInfo = document.createElement('span');
                             cicloInfo.className = 'ciclo-info';
                             cicloInfo.textContent = `🔄 ${inicioStr} - ${finStr}`;
                             header.appendChild(cicloInfo);
                         }
                     }
-                    
-                    // Contar cuántos votaron y cuántos no
                     const votaron = jsonVotantes.votantes.filter(v => v.voto === true);
                     const noVotaron = jsonVotantes.votantes.filter(v => v.voto === false);
                     votantesCount.textContent = `${votaron.length} ✅ / ${noVotaron.length} ❌`;
-                    
-                    // Mostrar lista con colores (verde para los que votaron, rojo para los que no)
                     listaVotantes.innerHTML = jsonVotantes.votantes.map(v => {
-                        const claseColor = v.voto 
-                            ? 'bg-green-100 text-green-800 border-green-300' 
-                            : 'bg-red-100 text-red-800 border-red-300';
+                        const claseColor = v.voto ? 'bg-green-100 text-green-800 border-green-300' : 'bg-red-100 text-red-800 border-red-300';
                         const icono = v.voto ? '✅' : '❌';
-                        return `
-                            <span class="px-4 py-2 rounded-full border text-sm font-medium ${claseColor}">
-                                ${icono} ${v.nombre}
-                            </span>
-                        `;
+                        return `<span class="px-4 py-2 rounded-full border text-sm font-medium ${claseColor}">${icono} ${v.nombre}</span>`;
                     }).join('');
-                    
-                } else {
-                    votantesCard.classList.add('hidden');
-                }
+                } else { votantesCard.classList.add('hidden'); }
 
-                // --- OBTENER ÚLTIMA COMIDA ---
                 const resAnterior = await fetch(API_URL + "?action=get_ultima_comida");
                 const jsonAnterior = await resAnterior.json();
                 if (jsonAnterior.success && Object.keys(jsonAnterior.menuAnterior).length > 0) {
@@ -574,11 +670,8 @@
                             <span class="text-purple-900 block text-[9px] font-black uppercase">${cat}</span>
                             <span class="text-slate-800 text-sm font-bold">${plato}</span>
                         </div>`).join('');
-                } else {
-                    ultimaComidaCont.classList.add('hidden');
-                }
+                } else { ultimaComidaCont.classList.add('hidden'); }
 
-                // --- OBTENER RESULTADOS DEL DÍA ---
                 const res = await fetch(API_URL + "?action=get_resultados_dia");
                 const json = await res.json();
                 if (json.success && Object.keys(json.resultados).length > 0) {
@@ -595,13 +688,11 @@
                         grid.appendChild(card);
                     }
                 } else { grid.innerHTML = '<p class="col-span-full text-center text-slate-500 py-10">Sin votos registrados.</p>'; }
-
             } catch (e) { 
                 console.error("Error en renderStats:", e);
                 grid.innerHTML = '<p class="col-span-full text-center text-red-400 py-10">Error de conexión.</p>'; 
             }
 
-            // --- ACUMULADO HISTÓRICO ---
             try {
                 const histRes = await fetch(API_URL + "?action=get_stats");
                 const histData = await histRes.json();
@@ -678,6 +769,310 @@
                 sessionVerificationInterval = null;
             }
             location.reload(); 
+        }
+
+        // ============================================================
+        // MÓDULO GASTOS DE REFRIGERIO
+        // ============================================================
+        const PRESUPUESTO_X_PERSONA = 5;
+        let gastosState = { gastos: [], comensales: {} };
+        let gastosStaging = [];
+
+        function getHoyStr() {
+            const d = new Date();
+            return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+        }
+        const fmtSoles = n => Number(n).toFixed(2);
+
+        async function fetchGastosData() {
+            try {
+                const res = await fetch(API_URL + "?action=getGastosRefrigerio");
+                const data = await res.json();
+                if (data.success) {
+                    gastosState.gastos = data.gastos || [];
+                    gastosState.comensales = data.comensales || {};
+                }
+            } catch(e) { console.error("Error gastos:", e); }
+            renderStaging();
+        }
+
+        const getComensalesPorFecha = f => gastosState.comensales[f] || 0;
+        const getGastosPorFecha = f => gastosState.gastos.filter(g => g.fecha === f);
+        const getPresupuestoDiario = f => getComensalesPorFecha(f) * PRESUPUESTO_X_PERSONA;
+
+        function getGastosEnRango(desde, hasta) {
+            if (!desde && !hasta) return gastosState.gastos;
+            return gastosState.gastos.filter(g => {
+                if (desde && g.fecha < desde) return false;
+                if (hasta && g.fecha > hasta) return false;
+                return true;
+            });
+        }
+
+        function calcularIndicadoresGastos(desde, hasta) {
+            const gastos = getGastosEnRango(desde, hasta);
+            const totalGasto = gastos.reduce((s,g) => s + Number(g.monto), 0);
+            const fechas = new Set(gastos.map(g => g.fecha));
+            Object.keys(gastosState.comensales).forEach(f => {
+                if ((!desde || f >= desde) && (!hasta || f <= hasta)) fechas.add(f);
+            });
+            let totalComensales = 0, presupuestoTotal = 0;
+            fechas.forEach(f => {
+                totalComensales += getComensalesPorFecha(f);
+                presupuestoTotal += getPresupuestoDiario(f);
+            });
+            return {
+                totalGasto,
+                perCapita: totalComensales > 0 ? totalGasto / totalComensales : 0,
+                ahorro: presupuestoTotal - totalGasto
+            };
+        }
+
+        // ============================================================
+        // PRESUPUESTO DEL DÍA
+        // ============================================================
+        function calcularPresupuesto() {
+            const num = parseInt(document.getElementById('g-num-comensales').value) || 0;
+            if (num <= 0) {
+                document.getElementById('g-presupuesto').value = '0.00';
+                renderAhorroPreview();
+                return;
+            }
+            document.getElementById('g-presupuesto').value = fmtSoles(num * PRESUPUESTO_X_PERSONA);
+            renderAhorroPreview();
+        }
+
+        async function guardarComensales() {
+            const num = parseInt(document.getElementById('g-num-comensales').value) || 0;
+            if (num <= 0) return alert("Ingresa un número de comensales válido antes de guardar.");
+
+            const fecha = getHoyStr();
+            try {
+                const res = await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'setComensalesRefrigerio', fecha, num })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    gastosState.gastos = data.gastos || [];
+                    gastosState.comensales = data.comensales || {};
+                    // Limpiar inputs del presupuesto → el ahorro vuelve a 0 si no hay staging
+                    document.getElementById('g-num-comensales').value = '';
+                    document.getElementById('g-presupuesto').value = '';
+                    renderGastosSeccion();
+                    renderReportesSeccion();
+                } else {
+                    alert(data.message || "Error al guardar");
+                }
+            } catch(e) {
+                alert("Error de conexión");
+            }
+        }
+
+        // ============================================================
+        // AGREGAR GASTO CON STAGING
+        // ============================================================
+        function anadirGastoStaging() {
+            const fecha = document.getElementById('g-fecha').value;
+            const concepto = document.getElementById('g-concepto').value.trim();
+            const monto = parseFloat(document.getElementById('g-monto').value);
+
+            if (!fecha) return alert("Selecciona una fecha");
+            if (!concepto) return alert("Ingresa un concepto");
+            if (isNaN(monto) || monto <= 0) return alert("Ingresa un monto válido");
+
+            gastosStaging.push({ fecha, concepto, monto });
+
+            document.getElementById('g-concepto').value = '';
+            document.getElementById('g-monto').value = '';
+            document.getElementById('g-concepto').focus();
+
+            renderStaging();
+            renderAhorroPreview();
+        }
+
+        function quitarGastoStaging(index) {
+            gastosStaging.splice(index, 1);
+            renderStaging();
+            renderAhorroPreview();
+        }
+
+        function renderStaging() {
+            const tbody = document.getElementById('g-staging-tabla');
+            const totalEl = document.getElementById('g-staging-total');
+            const btnGrabar = document.getElementById('g-btn-grabar');
+            if (!tbody || !totalEl || !btnGrabar) return;
+
+            const total = gastosStaging.reduce((s, g) => s + Number(g.monto), 0);
+            totalEl.textContent = fmtSoles(total) + ' S/';
+
+            if (gastosStaging.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="p-3 text-center text-slate-500 text-xs">Aún no has añadido gastos</td></tr>';
+                btnGrabar.disabled = true;
+            } else {
+                tbody.innerHTML = gastosStaging.map((g, i) => `
+                    <tr class="border-b border-white/10">
+                        <td class="p-2 text-sm">${g.fecha}</td>
+                        <td class="p-2 text-sm">${g.concepto}</td>
+                        <td class="p-2 text-sm text-right font-bold">${fmtSoles(g.monto)}</td>
+                        <td class="p-2 text-center">
+                            <button onclick="quitarGastoStaging(${i})" class="text-red-500 hover:text-red-700 font-bold text-xs">✕</button>
+                        </td>
+                    </tr>`).join('');
+                btnGrabar.disabled = false;
+            }
+        }
+
+        // Previsualización del ahorro del día = presupuesto calculado − staging
+        function renderAhorroPreview() {
+            const num = parseInt(document.getElementById('g-num-comensales').value) || 0;
+            const presupuesto = num * PRESUPUESTO_X_PERSONA;
+            const totalStaging = gastosStaging.reduce((s, g) => s + Number(g.monto), 0);
+            const ahorro = presupuesto - totalStaging;
+
+            const ahorroEl = document.getElementById('g-ahorro');
+            if (ahorroEl) {
+                ahorroEl.textContent = fmtSoles(ahorro) + ' S/';
+                ahorroEl.className = 'text-3xl font-black ' + (ahorro >= 0 ? 'text-green-600' : 'text-red-600');
+            }
+        }
+
+        async function grabarGastos() {
+            if (gastosStaging.length === 0) return;
+            const btnGrabar = document.getElementById('g-btn-grabar');
+            const total = gastosStaging.length;
+            btnGrabar.disabled = true;
+            btnGrabar.textContent = 'Grabando...';
+
+            try {
+                const resultados = await Promise.all(gastosStaging.map(g =>
+                    fetch(API_URL, {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            action: 'addGastoRefrigerio',
+                            fecha: g.fecha,
+                            concepto: g.concepto,
+                            monto: g.monto
+                        })
+                    }).then(r => r.json())
+                ));
+
+                const errores = resultados.filter(r => !r.success);
+                if (errores.length > 0) {
+                    alert(`⚠️ ${errores.length} de ${total} gasto(s) no se pudieron grabar.`);
+                }
+
+                await fetchGastosData();
+
+                gastosStaging = [];
+                document.getElementById('g-concepto').value = '';
+                document.getElementById('g-monto').value = '';
+                renderStaging();
+                renderAhorroPreview();
+                renderGastosSeccion();
+                renderReportesSeccion();
+
+            } catch(e) {
+                alert("Error de conexión al grabar. Algunos gastos pueden no haberse guardado.");
+                await fetchGastosData();
+                renderStaging();
+                renderAhorroPreview();
+            } finally {
+                btnGrabar.textContent = 'Grabar';
+                btnGrabar.disabled = gastosStaging.length === 0;
+            }
+        }
+
+        // ============================================================
+        // RENDER DE LA SECCIÓN GASTOS
+        // ============================================================
+        function renderGastosSeccion() {
+            const hoy = getHoyStr();
+            const fechaInput = document.getElementById('g-fecha');
+            if (fechaInput && !fechaInput.value) fechaInput.value = hoy;
+
+            const numGuardado = getComensalesPorFecha(hoy);
+            const infoEl = document.getElementById('g-comensales-guardados');
+            if (infoEl) {
+                infoEl.textContent = numGuardado > 0
+                    ? `✔️ Comensales ya guardados para hoy: ${numGuardado} (presupuesto: S/ ${fmtSoles(numGuardado * PRESUPUESTO_X_PERSONA)})`
+                    : 'ℹ️ Aún no hay comensales guardados para hoy.';
+            }
+
+            // Tabla de gastos YA grabados hoy
+            const tbody = document.getElementById('g-tabla-hoy');
+            if (tbody) {
+                const gastosHoy = getGastosPorFecha(hoy);
+                tbody.innerHTML = gastosHoy.length === 0
+                    ? '<tr><td colspan="3" class="p-4 text-center text-slate-500 text-sm">Sin gastos grabados hoy</td></tr>'
+                    : gastosHoy.map(g => `
+                        <tr class="border-b border-white/10">
+                            <td class="p-3 text-sm">${g.fecha}</td>
+                            <td class="p-3 text-sm">${g.concepto || ''}</td>
+                            <td class="p-3 text-sm text-right font-bold">${fmtSoles(g.monto)}</td>
+                        </tr>`).join('');
+            }
+
+            renderStaging();
+            renderAhorroPreview();
+        }
+
+        // ============================================================
+        // RENDER DE LA SECCIÓN REPORTES
+        // ============================================================
+        function renderReportesSeccion() {
+            const desdeInput = document.getElementById('r-desde');
+            const hastaInput = document.getElementById('r-hasta');
+            if (desdeInput && !desdeInput.value) {
+                const d = new Date(); d.setDate(d.getDate() - 30);
+                desdeInput.value = d.toISOString().slice(0,10);
+            }
+            if (hastaInput && !hastaInput.value) hastaInput.value = getHoyStr();
+
+            const desde = desdeInput.value, hasta = hastaInput.value;
+
+            // Indicadores del rango filtrado
+            if (desde && hasta) {
+                const ind = calcularIndicadoresGastos(desde, hasta);
+                document.getElementById('r-filtro-total').textContent = fmtSoles(ind.totalGasto);
+                document.getElementById('r-filtro-percapita').textContent = fmtSoles(ind.perCapita);
+                const ahorroEl = document.getElementById('r-filtro-ahorro');
+                ahorroEl.textContent = fmtSoles(ind.ahorro);
+                ahorroEl.className = 'text-3xl font-black ' + (ind.ahorro >= 0 ? 'text-green-600' : 'text-red-600');
+            }
+
+            // Indicadores del mes en curso
+            const d = new Date();
+            const y = d.getFullYear(), m = String(d.getMonth()+1).padStart(2,'0');
+            const ultimo = new Date(y, d.getMonth()+1, 0).getDate();
+            const indMes = calcularIndicadoresGastos(`${y}-${m}-01`, `${y}-${m}-${String(ultimo).padStart(2,'0')}`);
+            document.getElementById('r-mes-total').textContent = fmtSoles(indMes.totalGasto);
+            document.getElementById('r-mes-percapita').textContent = fmtSoles(indMes.perCapita);
+            const mesAhorroEl = document.getElementById('r-mes-ahorro');
+            mesAhorroEl.textContent = fmtSoles(indMes.ahorro);
+            mesAhorroEl.className = 'text-3xl font-black ' + (indMes.ahorro >= 0 ? 'text-green-600' : 'text-red-600');
+
+            // ====== DESGLOSE DE GASTOS DEL RANGO ======
+            const tbodyDesglose = document.getElementById('r-tabla-desglose');
+            const countEl = document.getElementById('r-desglose-count');
+            if (tbodyDesglose) {
+                const gastosFiltrados = (desde && hasta)
+                    ? getGastosEnRango(desde, hasta).slice().sort((a,b) => a.fecha.localeCompare(b.fecha))
+                    : [];
+
+                if (countEl) countEl.textContent = `${gastosFiltrados.length} registro${gastosFiltrados.length === 1 ? '' : 's'}`;
+
+                if (gastosFiltrados.length === 0) {
+                    tbodyDesglose.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-slate-500 text-sm">Sin gastos en el rango seleccionado</td></tr>';
+                } else {
+                    tbodyDesglose.innerHTML = gastosFiltrados.map(g => `
+                        <tr class="border-b border-white/10 hover:bg-white/10 transition">
+                            <td class="p-3 text-sm">${g.fecha}</td>
+                            <td class="p-3 text-sm">${g.concepto || ''}</td>
+                            <td class="p-3 text-sm text-right font-bold">${fmtSoles(g.monto)}</td>
+                        </tr>`).join('');
+                }
+            }
         }
     </script>
 </body>
