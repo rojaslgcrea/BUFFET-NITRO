@@ -8,7 +8,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { background-image: url('https://i.ibb.co/Z1SP3ws9/NITROTIENDA-CUZCO.jpg'); background-size: cover; background-position: center; background-attachment: fixed; background-repeat: no-repeat; }
+        body { background-image: url('https://cdn.pixabay.com/photo/2012/04/26/22/48/machu-picchu-43387_1280.jpg'); background-size: cover; background-position: center; background-attachment: fixed; background-repeat: no-repeat; }
         .glass-card { background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1); }
         .transition-all-suave { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         .hover-elevate:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
@@ -121,9 +121,14 @@
                     <p class="text-slate-600 text-sm mt-1">Registra comensales y gastos diarios del buffet. Presupuesto: S/ 5 por persona.</p>
                 </header>
 
+                <!-- INICIO DEL BLOQUE MODIFICADO -->
                 <div class="glass-card p-6 md:p-8 rounded-3xl mb-6 transition-all-suave hover-elevate">
                     <h3 class="text-[10px] font-black text-purple-900 uppercase tracking-widest mb-4">🥗 Presupuesto del día</h3>
-                    <div class="grid gap-4 md:grid-cols-4 items-end">
+                    <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-5 items-end">
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Fecha</label>
+                            <input type="date" id="g-fecha-comensales" onchange="cargarComensalesPorFecha()" class="w-full p-3 bg-white/60 border border-white/30 rounded-xl outline-none focus:ring-2 focus:ring-purple-400 transition-all-suave">
+                        </div>
                         <div>
                             <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Nº de comensales</label>
                             <input type="number" id="g-num-comensales" min="0" step="1" placeholder="0" oninput="renderAhorroPreview()" class="w-full p-3 bg-white/60 border border-white/30 rounded-xl outline-none focus:ring-2 focus:ring-purple-400 transition-all-suave">
@@ -137,6 +142,7 @@
                     </div>
                     <p id="g-comensales-guardados" class="text-[10px] text-slate-500 italic mt-3"></p>
                 </div>
+                <!-- FIN DEL BLOQUE MODIFICADO -->
 
                 <div class="glass-card p-6 md:p-8 rounded-3xl mb-6 transition-all-suave hover-elevate">
                     <h3 class="text-[10px] font-black text-purple-900 uppercase tracking-widest mb-4">➕ Agregar gasto</h3>
@@ -336,8 +342,6 @@
         const SUPABASE_URL = 'https://iinvzyuryznwwwgddpjd.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlpbnZ6eXVyeXpud3d3Z2RkcGpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAwMDExNDgsImV4cCI6MjEwNTU3NzE0OH0.6b1s8QPne7gwF8fmJWFeQD73lbTQumzpSlV2ziOH7AM';
 
-        // ⚠️ IMPORTANTE: la variable se llama supabaseClient (no supabase)
-        // porque el SDK ya crea una variable global 'supabase' y no se puede redeclarar.
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         const PRESUPUESTO_X_PERSONA = 5;
@@ -921,11 +925,32 @@
             renderAhorroPreview();
         }
 
+        function cargarComensalesPorFecha() {
+            const fechaInput = document.getElementById('g-fecha-comensales');
+            const fecha = fechaInput ? fechaInput.value : getHoyStr();
+            if (!fecha) return;
+
+            const numGuardado = getComensalesPorFecha(fecha);
+            document.getElementById('g-num-comensales').value = numGuardado > 0 ? numGuardado : '';
+            document.getElementById('g-presupuesto').value = numGuardado > 0 ? fmtSoles(numGuardado * PRESUPUESTO_X_PERSONA) : '0.00';
+            
+            renderAhorroPreview();
+            
+            const infoEl = document.getElementById('g-comensales-guardados');
+            if (infoEl) {
+                infoEl.textContent = numGuardado > 0
+                    ? `✔️ Comensales ya guardados para el ${fecha}: ${numGuardado} (presupuesto: S/ ${fmtSoles(numGuardado * PRESUPUESTO_X_PERSONA)})`
+                    : `ℹ️ Aún no hay comensales guardados para el ${fecha}.`;
+            }
+        }
+
         async function guardarComensales() {
             const num = parseInt(document.getElementById('g-num-comensales').value) || 0;
-            if (num <= 0) return alert("Ingresa un número de comensales válido antes de guardar.");
+            const fechaInput = document.getElementById('g-fecha-comensales');
+            const fecha = fechaInput ? fechaInput.value : getHoyStr();
 
-            const fecha = getHoyStr();
+            if (!fecha) return alert("Selecciona una fecha válida.");
+            if (num <= 0) return alert("Ingresa un número de comensales válido antes de guardar.");
 
             const { error } = await supabaseClient
                 .from('comensales_refrigerio')
@@ -1034,15 +1059,24 @@
 
         function renderGastosSeccion() {
             const hoy = getHoyStr();
+            
             const fechaInput = document.getElementById('g-fecha');
             if (fechaInput && !fechaInput.value) fechaInput.value = hoy;
 
-            const numGuardado = getComensalesPorFecha(hoy);
+            const fechaComensalesInput = document.getElementById('g-fecha-comensales');
+            if (fechaComensalesInput && !fechaComensalesInput.value) {
+                fechaComensalesInput.value = hoy;
+                cargarComensalesPorFecha();
+            }
+
+            const fechaSeleccionada = fechaComensalesInput ? fechaComensalesInput.value : hoy;
+            const numGuardado = getComensalesPorFecha(fechaSeleccionada);
+            
             const infoEl = document.getElementById('g-comensales-guardados');
             if (infoEl) {
                 infoEl.textContent = numGuardado > 0
-                    ? `✔️ Comensales ya guardados para hoy: ${numGuardado} (presupuesto: S/ ${fmtSoles(numGuardado * PRESUPUESTO_X_PERSONA)})`
-                    : 'ℹ️ Aún no hay comensales guardados para hoy.';
+                    ? `✔️ Comensales ya guardados para el ${fechaSeleccionada}: ${numGuardado} (presupuesto: S/ ${fmtSoles(numGuardado * PRESUPUESTO_X_PERSONA)})`
+                    : `ℹ️ Aún no hay comensales guardados para el ${fechaSeleccionada}.`;
             }
 
             const tbody = document.getElementById('g-tabla-hoy');
